@@ -61,7 +61,10 @@
    <value n="defaultPackage" v="uml"/>
    <hash n="oracle.ide.model.TechnologyScopeConfiguration">
       <list n="technologyScope">
+         <string v="Java"/>
+         <string v="Java-Modeling"/>
          <string v="UML"/>
+         <string v="XML"/>
       </list>
    </hash>
    <hash n="oracle.jdeveloper.compiler.OjcConfiguration">
