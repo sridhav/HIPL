@@ -17,7 +17,7 @@ public class MapImageBundle implements ImageBundle {
      private Collection newAtt;
 
       /**
-      * Adds Image to the ImageBundle.
+      * Adds Image to the MapImageBundle.
       * @param himage HImage class object holds image and image header data.
       * @see com.okstate.HIPL.image.HImage
       */
@@ -26,7 +26,7 @@ public class MapImageBundle implements ImageBundle {
 
      }
       /**
-      *  Adds Image to the ImageBundle.
+      *  Adds Image to the MapImageBundle.
       *  @param inputStream reads data from InputStream
       *  @see java.io.InputStream
       */
@@ -35,7 +35,7 @@ public class MapImageBundle implements ImageBundle {
 
      }
       /**
-      *Adds Image to the ImageBundle
+      *Adds Image to the MapImageBundle
       * @param file reads data from File
       * @see java.io.File
       */
@@ -44,7 +44,7 @@ public class MapImageBundle implements ImageBundle {
 
      }
       /**
-      *Adds Image to the ImageBundle
+      *Adds Image to the MapImageBundle
       * @param path reads data from the path
       * @see @link java.nio.file.Path
       */
@@ -53,7 +53,7 @@ public class MapImageBundle implements ImageBundle {
 
      }
       /**
-       * Gets Images from the ImageBundle
+       * Gets Images from the MapImageBundle
        * @return Returns HImage Array from the Image Bundle
        * @see com.okstate.HIPL.image.HImage
        */
@@ -64,7 +64,7 @@ public class MapImageBundle implements ImageBundle {
          return l;
       }
       /**
-      *Gets the image count in the image bundle
+      *Gets the image count in the MapImageBundle
       * @return returns image count
       *
       */
@@ -73,7 +73,7 @@ public class MapImageBundle implements ImageBundle {
          return 10;
      }
       /**
-       * closes the stream for this current bundle
+       * closes the stream for this current MapImageBundle
        *
        */
       @Override
@@ -81,7 +81,7 @@ public class MapImageBundle implements ImageBundle {
           
       }
       /**
-      *Gets the current image bundle path of the HDFS
+      *Gets the current MapImageBundle path of the HDFS
       * @return returns the imagebundle path
       * @see java.nio.file.Path
       */
@@ -92,15 +92,15 @@ public class MapImageBundle implements ImageBundle {
      }
       
       /**
-      *Checks whether if there are any images in the bundle.
-      * @return a boolean indicating if there are any images there in image bundle
+      *Checks whether if there are any images in the MapImageundle.
+      * @return a boolean indicating if there are any images there in MapImageBundle
       */
       @Override
      public boolean hasNext() {
          return false;
      }
       /**
-      * Gets the current Image from the bundle
+      * Gets the current Image from the MapImageBundle
       *@param himage HImage class object holds image and image header data.
       * @return the current image of the image bundle
       * @see com.okstate.HIPL.image.HImage
@@ -111,21 +111,21 @@ public class MapImageBundle implements ImageBundle {
          return new HImage();
      }
       /**
-      * Method to open image bundle in Read Mode
+      * Method to open MapImageBundle in Read Mode
       */
       @Override
      public void openToRead() {
 
      }
       /**
-      * Method to open image bundle in Write Mode
+      * Method to open MapImageBundle in Write Mode
       */
       @Override
      public void openToWrite() {
 
      }
       /**
-      * Gets HImage from the bundle
+      * Gets HImage from the MapImageBundle
       * @param himage HImage class object holds image and image header data.
       * @return the current image of the image bundle
       * @see com.okstate.HIPL.image.HImage
@@ -136,7 +136,7 @@ public class MapImageBundle implements ImageBundle {
          return new HImage();
      }
       /**
-      * Method to open image bundle
+      * Method to open MapImageBundle
       * @param mode determines to read or write
       * @param overwrite overwrites file
       */
@@ -145,7 +145,7 @@ public class MapImageBundle implements ImageBundle {
 
      }
       /**
-      *Method to open image bundle
+      *Method to open MapImageBundle
       * @param mode mode determines to read or write
       */
       @Override
