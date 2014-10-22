@@ -7,6 +7,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
 
+import org.opencv.core.Mat;
+
 public class HImage {
     /**
      * Constructor to create an HImage which holds the image and header data.
