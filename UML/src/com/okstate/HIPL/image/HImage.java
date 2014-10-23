@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.tools.FileObject;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -26,7 +27,17 @@ public class HImage {
      * Constructor to create an HImage which holds the image and header data.
      * @param file - Generates HImage from a File.
      */
-    static{ System.load("/home/sridhar/NetBeansProjects/HIPL/UML/src/lib/libopencv_java249.so");}
+    static{ 
+        if(System.getProperty("os.name").toLowerCase().contains("windows")){
+            File x=new File("src/lib/x64/opencv_java249.dll");
+            System.load(x.getAbsolutePath());
+        }
+        else if(System.getProperty("os.name").toLowerCase().contains("linux")){
+            File x=new File("src/lib/libopencv_java249.so");
+            System.load(x.getAbsolutePath());
+        }
+        System.out.println(System.getProperty("os.name"));
+    }
     
     private byte[] imagebytes=null;
     private BufferedImage bufferedImage=null;
@@ -145,10 +156,8 @@ public class HImage {
     public static void main(String args[]) {    
             /* Create and display the form */
         HImage x=new HImage(new File("./sri.jpg"));
-       Mat y=x.getMatImage();
+        Mat y=x.getMatImage();
         BufferedImage z=x.getBufferedImage();
-        
         System.out.println(z.getHeight());
-        
     }
 }
