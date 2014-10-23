@@ -1,5 +1,10 @@
 package com.okstate.HIPL.image;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
 import com.okstate.HIPL.header.HImageHeader;
 
 import java.awt.Frame;
@@ -14,6 +19,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.tools.FileObject;
@@ -155,9 +162,22 @@ public class HImage {
     
     public static void main(String args[]) {    
             /* Create and display the form */
-        HImage x=new HImage(new File("./sri.jpg"));
+        HImage x=new HImage(new File("./img.jpg"));
         Mat y=x.getMatImage();
         BufferedImage z=x.getBufferedImage();
         System.out.println(z.getHeight());
+        try {
+            Metadata metadata = ImageMetadataReader.readMetadata(new File("./img.jpg"));
+            System.out.println(metadata.getDirectoryCount());  
+            for (Directory directory : metadata.getDirectories()) {
+            for (Tag tag : directory.getTags()) {
+                System.out.println(tag);
+            }
+        }
+        } catch (ImageProcessingException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
