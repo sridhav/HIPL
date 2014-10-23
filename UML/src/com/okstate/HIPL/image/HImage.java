@@ -5,6 +5,7 @@ import com.okstate.HIPL.header.HImageHeader;
 import java.awt.Frame;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,7 +26,7 @@ public class HImage {
      * Constructor to create an HImage which holds the image and header data.
      * @param file - Generates HImage from a File.
      */
-    static{ System.load("/home/sridhar/jdeveloper/mywork/HIPL/UML/src/lib/x86/opencv_java249.dll"); }
+    static{ System.load("/home/sridhar/NetBeansProjects/HIPL/UML/src/lib/libopencv_java249.so");}
     
     private byte[] imagebytes=null;
     private BufferedImage bufferedImage=null;
@@ -120,9 +121,11 @@ public class HImage {
     }
     
     private void generateMatImage(){
-        if(bufferedImage!=null)
+        if(bufferedImage==null)
             generateBufferedImage();
+        byte[] temp=((DataBufferByte)bufferedImage.getRaster().getDataBuffer()).getData();
         mat=new Mat(bufferedImage.getWidth(),bufferedImage.getHeight(),CvType.CV_8UC3);
+        mat.put(0,0,temp);
     }
     
     private void generateBufferedImage(){
@@ -142,8 +145,10 @@ public class HImage {
     public static void main(String args[]) {    
             /* Create and display the form */
         HImage x=new HImage(new File("./sri.jpg"));
-        Mat y=x.getMatImage();
+       Mat y=x.getMatImage();
         BufferedImage z=x.getBufferedImage();
+        
+        System.out.println(z.getHeight());
         
     }
 }
