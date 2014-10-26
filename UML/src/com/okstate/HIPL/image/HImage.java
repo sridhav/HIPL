@@ -7,8 +7,7 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.okstate.HIPL.header.HImageHeader;
 
-import java.awt.Frame;
-import java.awt.Image;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 
@@ -51,6 +50,10 @@ public class HImage {
     private Mat mat=null;
     private HImageHeader imageheader=null;
     
+    public HImage(byte[] by){
+        this.imagebytes=by;
+    }
+    
     public HImage(File file) {
         FileInputStream fis=null;
         try {
@@ -63,6 +66,9 @@ public class HImage {
             System.out.println("IO NOT FOUND");
         }
     }
+    
+    
+    
     /**
      * Constructor to create an HImage which holds the image and header data.
      * @param inputstream - Generates HImage from InputStream.
@@ -179,5 +185,9 @@ public class HImage {
         } catch (IOException ex) {
             Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public byte[] getImageBytes() {
+        return imagebytes;
     }
 }
