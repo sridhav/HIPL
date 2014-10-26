@@ -6,9 +6,10 @@ import com.okstate.HIPL.image.HImageEncoder;
 import java.io.File;
 import java.io.InputStream;
 
-import java.nio.file.Path;
+
 
 import java.util.Collection;
+import org.apache.hadoop.fs.Path;
 
 public class MapImageBundle implements ImageBundle {
      /**

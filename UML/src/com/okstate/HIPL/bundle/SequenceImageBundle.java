@@ -2,28 +2,55 @@ package com.okstate.HIPL.bundle;
 
 import com.okstate.HIPL.image.HImage;
 import com.okstate.HIPL.image.HImageEncoder;
+import com.okstate.HIPL.util.Config;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
-import java.nio.file.Path;
 
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.SequenceFile;
 
 public class SequenceImageBundle implements ImageBundle {
     /**
      * @associates <{uml.ImageHeader}>
      */
-    private Collection newAtt;
+    private SequenceFile.Writer _SeqWriter;
+    private SequenceFile.Reader _SeqReader;
+    Config _hConf;
+    long addedImages=0;
+    long _tempKey;
+    HImage _tempImage;
+    
+    public SequenceImageBundle(Path path, Configuration conf) {
+        _hConf=new Config(path,conf);       
+    }
 
      /**
      * Adds Image to the SequenceImageBundle.
      * @param himage HImage class object holds image and image header data.
      * @see com.okstate.HIPL.image.HImage
      */
+    
      @Override
     public void addImage(HImage himage) {
-
+        try {
+            if(_SeqWriter==null){
+                openToWrite();
+            }
+            addedImages++;
+            _SeqWriter.append(new LongWritable(addedImages), new BytesWritable(himage.getImageBytes()));
+        } catch (IOException ex) {
+            Logger.getLogger(SequenceImageBundle.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
      /**
      *  Adds Image to the SequenceImageBundle.
@@ -32,7 +59,8 @@ public class SequenceImageBundle implements ImageBundle {
      */
      @Override
     public void addImage(InputStream inputStream) {
-
+        HImage temp=new HImage(inputStream);
+        addImage(temp);
     }
      /**
      *Adds Image to the SequenceImageBundle
@@ -41,16 +69,16 @@ public class SequenceImageBundle implements ImageBundle {
      */
      @Override
     public void addImage(File file) {
-
+        HImage temp=new HImage(file);
+        addImage(temp);
     }
      /**
      *Adds Image to the SequenceImageBundle
      * @param path reads data from the path
      * @see @link java.nio.file.Path
      */
-     @Override
+    @Override
     public void addImage(Path path) {
-
     }
      /**
       * Gets Images from the SequenceImageBundle
@@ -59,7 +87,6 @@ public class SequenceImageBundle implements ImageBundle {
       */
      @Override
      public HImage[] getImages(){
-      
         HImage[] l=new HImage[10];
         return l;
      }
@@ -78,7 +105,18 @@ public class SequenceImageBundle implements ImageBundle {
       */
      @Override
      public void close(){
+         try {
+         if(_SeqReader!=null){
+             
+                 _SeqReader.close();
          
+         }
+         if(_SeqWriter!=null){
+             _SeqWriter.close();
+         }
+             } catch (IOException ex) {
+                 Logger.getLogger(SequenceImageBundle.class.getName()).log(Level.SEVERE, null, ex);
+             }
      }
      /**
      *Gets the current SequenceImageBundle path of the HDFS
@@ -97,6 +135,17 @@ public class SequenceImageBundle implements ImageBundle {
      */
      @Override
     public boolean hasNext() {
+        try {
+            LongWritable key =new LongWritable();
+            BytesWritable image=new BytesWritable();
+            if(_SeqReader.next(key,image)){
+                _tempKey=(long)key.get();
+                _tempImage=new HImage(image.getBytes());
+                return true;
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(SequenceImageBundle.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return false;
     }
      /**
@@ -115,14 +164,22 @@ public class SequenceImageBundle implements ImageBundle {
      */
      @Override
     public void openToRead() {
-
+        try {
+            _SeqReader=new SequenceFile.Reader(this._hConf.getFileSystem(), this._hConf.getPath(),this._hConf.getConfiguration());
+        } catch (IOException ex) {
+            Logger.getLogger(SequenceImageBundle.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
      /**
      * Method to open SequenceImageBundle in Write Mode
      */
      @Override
     public void openToWrite() {
-
+        try {
+            _SeqWriter=new SequenceFile.Writer(this._hConf.getFileSystem(), this._hConf.getConfiguration(),this._hConf.getPath(), LongWritable.class, BytesWritable.class);
+        } catch (IOException ex) {
+            Logger.getLogger(SequenceImageBundle.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
      /**
      * Gets HImage from the SequenceImageBundle
@@ -133,7 +190,7 @@ public class SequenceImageBundle implements ImageBundle {
      */
      @Override
     public HImage getImage() {
-        return new HImage();
+        return _tempImage;
     }
      /**
      * Method to open SequenceImageBundle
@@ -179,4 +236,6 @@ public class SequenceImageBundle implements ImageBundle {
     public void addImage(HImage himage, int type) {
 
     }
+
+    
 }
