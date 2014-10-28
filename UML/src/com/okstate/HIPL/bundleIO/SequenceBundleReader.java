@@ -5,6 +5,7 @@
  */
 package com.okstate.HIPL.bundleIO;
 
+import com.okstate.HIPL.bundle.BundleFile;
 import com.okstate.HIPL.image.HImage;
 import com.okstate.HIPL.util.Config;
 import java.io.IOException;
@@ -25,16 +26,23 @@ public class SequenceBundleReader implements BundleReader{
     private SequenceFile.Reader _seqReader;
     private long _seqTotal=0;
     private Config _hConf;
+    private BundleFile _file;
     long _tempKey;
     HImage _tempImage;
     
+    public SequenceBundleReader(BundleFile file){
+        _file=file;
+    }
+    
     public SequenceBundleReader(String path, Configuration conf){
         _hConf=new Config(path,conf);
+        _file=new BundleFile(path, conf);
         openToRead();
     }
     
     public SequenceBundleReader(Path path, Configuration conf){
         _hConf=new Config(path,conf);
+        _file=new BundleFile(path, conf);
         openToRead();
     }
     

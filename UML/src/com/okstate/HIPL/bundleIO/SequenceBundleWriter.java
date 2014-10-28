@@ -5,6 +5,7 @@
  */
 package com.okstate.HIPL.bundleIO;
 
+import com.okstate.HIPL.bundle.BundleFile;
 import com.okstate.HIPL.image.HImage;
 import com.okstate.HIPL.util.Config;
 import java.io.File;
@@ -27,14 +28,20 @@ public class SequenceBundleWriter implements BundleWriter{
     private SequenceFile.Writer _seqWriter;
     private Config _hConf;
     private long _seqTotal=0;
+    private BundleFile _file;
+    public SequenceBundleWriter(BundleFile file){
+        _file=file;
+    }
     
     public SequenceBundleWriter(String path, Configuration conf){
         _hConf=new Config(path, conf);
+        _file=new BundleFile(path,conf);
         openToWrite();
     }
     
     public SequenceBundleWriter(Path path, Configuration conf){
         _hConf=new Config(path, conf);
+        _file=new BundleFile(path,conf);
         openToWrite();
     }
     
@@ -89,4 +96,11 @@ public class SequenceBundleWriter implements BundleWriter{
                 Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }    
+
+    @Override
+    public void appendBundle(Path path) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 }

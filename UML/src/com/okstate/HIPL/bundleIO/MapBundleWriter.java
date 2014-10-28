@@ -5,6 +5,7 @@
  */
 package com.okstate.HIPL.bundleIO;
 
+import com.okstate.HIPL.bundle.BundleFile;
 import com.okstate.HIPL.image.HImage;
 import com.okstate.HIPL.util.Config;
 import java.io.File;
@@ -27,14 +28,20 @@ public class MapBundleWriter implements BundleWriter{
     private Config _hConf;
     private MapFile.Writer _mapWriter;
     private long _total;
+    private BundleFile _file;
+    public MapBundleWriter(BundleFile file){
+        _file=file;
+    }
     
     public MapBundleWriter(String path, Configuration conf){
         _hConf=new Config(path, conf);
+        _file=new BundleFile(path,conf);
         openToWrite();
     }
     
     public MapBundleWriter(Path path, Configuration conf){
         _hConf=new Config(path, conf);
+        _file=new BundleFile(path,conf);
         openToWrite();
     }
     
@@ -88,6 +95,11 @@ public class MapBundleWriter implements BundleWriter{
         } catch (IOException ex) {
             Logger.getLogger(SequenceBundleReader.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public void appendBundle(Path path) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

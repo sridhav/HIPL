@@ -5,6 +5,7 @@
  */
 package com.okstate.HIPL.bundleIO;
 
+import com.okstate.HIPL.bundle.BundleFile;
 import com.okstate.HIPL.image.HImage;
 import com.okstate.HIPL.util.Config;
 import java.io.IOException;
@@ -26,15 +27,21 @@ public class MapBundleReader implements BundleReader{
     private long _totalCount;
     private long _tempKey;
     private HImage _tempImage;
+    private BundleFile _file;
     
+    public MapBundleReader(BundleFile file){
+        _file=file;
+    }
     
     public MapBundleReader(String path, Configuration conf){
         _hConf=new Config(path,conf);
+        _file=new BundleFile(path,conf);
         openToRead();
     }
     
     public MapBundleReader(Path path, Configuration conf){
         _hConf=new Config(path,conf);
+        _file=new BundleFile(path,conf);
         openToRead();
     }
     
