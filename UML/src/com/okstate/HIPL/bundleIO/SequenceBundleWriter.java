@@ -100,7 +100,7 @@ public class SequenceBundleWriter implements BundleWriter{
     }    
 
     @Override
-    public void appendBundle(Path path) {
+    public void appendBundle(Path path,Configuration conf) {
         try {
             System.out.println("MERGE STARTED: "+_hConf.getPath()+" and "+path +":"+System.currentTimeMillis());
             long start=System.currentTimeMillis();
@@ -115,7 +115,7 @@ public class SequenceBundleWriter implements BundleWriter{
     }
     
     public void appendBundle(BundleFile file){
-        appendBundle(file.getPath());
+        appendBundle(file.getPath(),file.getConfiguration());
     }
     
     @Override

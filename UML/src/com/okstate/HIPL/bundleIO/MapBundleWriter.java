@@ -99,8 +99,9 @@ public class MapBundleWriter implements BundleWriter{
     }
 
     @Override
-    public void appendBundle(Path path) {
+    public void appendBundle(Path path,Configuration conf) {
         try {
+            _hConf=new Config(path, conf);
             System.out.println("MERGE STARTED: "+_hConf.getPath()+" and "+path +":"+System.currentTimeMillis());
             long start=System.currentTimeMillis();
             FileUtil.copyMerge(_hConf.getFileSystem(), _file.getPath(), _hConf.getFileSystem(), path, true, null, null);
@@ -113,7 +114,7 @@ public class MapBundleWriter implements BundleWriter{
     }
     
     public void appendBundle(BundleFile file){
-        appendBundle(file.getPath());
+        appendBundle(file.getPath(),file.getConfiguration());
     }
     
     @Override

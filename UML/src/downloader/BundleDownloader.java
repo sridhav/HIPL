@@ -15,6 +15,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.IntWritable;
@@ -24,6 +25,7 @@ import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.Reducer;
 
 /**
  *
@@ -108,10 +110,42 @@ public class BundleDownloader {
                 
             }
             oc.collect(new BooleanWritable(true), new Text(bw.getBundleFile().getPath().toString()));
-        }
-        
-        
+        } 
     }
     
-    
+    public static class DownloaderReducer extends Reducer<BooleanWritable, Text, BooleanWritable, Text> {
+      
+        private static Configuration conf;
+       
+        @Override
+        public void setup(Context c){
+            conf=c.getConfiguration();
+        }
+        
+        @Override
+        public void reduce(BooleanWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
+            if(key.get()){
+                FileSystem fs=FileSystem.get(conf);
+                BundleWriter bw = null;
+                if(BundleDownloader.filetype=="seq"){
+                    bw=new SequenceBundleWriter(new Path(BundleDownloader.filePath), conf);
+                }
+                else if(BundleDownloader.filetype=="map"){
+                    bw=new MapBundleWriter(new Path(BundleDownloader.filePath), conf);
+                }
+                else{
+                    bw=new SequenceBundleWriter(new Path(BundleDownloader.filePath), conf);
+                }
+                
+                for(Text path:values){
+                    Path temp=new Path(path.toString());
+                    bw.appendBundle(temp,conf);  
+                }
+                
+                context.write(new BooleanWritable(true), new Text(bw.getBundleFile().getPath().toString()));
+		context.progress();
+            }
+        }
+        
+    }
 }

@@ -10,6 +10,7 @@ import com.okstate.HIPL.image.HImage;
 import com.okstate.HIPL.util.Config;
 import java.io.File;
 import java.io.InputStream;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 
 /**
@@ -26,7 +27,7 @@ public interface BundleWriter {
     
     void appendImage(File file);
     
-    void appendBundle(Path path);
+    void appendBundle(Path path,Configuration conf);
     
     Config getConfiguration();
     
