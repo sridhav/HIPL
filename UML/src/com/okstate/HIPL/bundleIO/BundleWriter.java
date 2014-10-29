@@ -5,6 +5,7 @@
  */
 package com.okstate.HIPL.bundleIO;
 
+import com.okstate.HIPL.bundle.BundleFile;
 import com.okstate.HIPL.image.HImage;
 import com.okstate.HIPL.util.Config;
 import java.io.File;
@@ -32,5 +33,7 @@ public interface BundleWriter {
     long getImageCount();
     
     void close();
+
+     BundleFile getBundleFile();
     
 }

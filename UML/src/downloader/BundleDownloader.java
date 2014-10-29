@@ -67,7 +67,7 @@ public class BundleDownloader {
             int i=k1.get();
             int prev=i;
             while((temp=reader.readLine())!=null){
-                if(i>=prev){
+                if(i>=prev+80){
                     bw.close();
                     oc.collect(new BooleanWritable(true), new Text(temppath));
                     temppath=BundleDownloader.filePath+i+".tmp";
@@ -105,8 +105,9 @@ public class BundleDownloader {
                
                 reader.close();
                 bw.close();
+                
             }
-                        
+            oc.collect(new BooleanWritable(true), new Text(bw.getBundleFile().getPath().toString()));
         }
         
         

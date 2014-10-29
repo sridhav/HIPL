@@ -118,5 +118,9 @@ public class SequenceBundleWriter implements BundleWriter{
         appendBundle(file.getPath());
     }
     
+    @Override
+    public BundleFile getBundleFile(){
+        return _file;
+    }
     
 }
