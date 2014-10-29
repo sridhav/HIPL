@@ -20,24 +20,18 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileSplit;
-import org.apache.hadoop.mapred.InputSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.JobContext;
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.Reporter;
-
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 /**
  *
  * @author LSAdmin
  */
 public class DownloadInputFormat extends FileInputFormat<IntWritable, Text> {
 
-    @Override
-    public RecordReader<IntWritable, Text> getRecordReader(InputSplit is, JobConf jc, Reporter rprtr) throws IOException {
-        return (RecordReader<IntWritable, Text>) new DownloadRecordReader();
-    }
     
     public List<InputSplit> getSplits(JobContext job){
         List<InputSplit> splits=new ArrayList<InputSplit>();
@@ -75,7 +69,7 @@ public class DownloadInputFormat extends FileInputFormat<IntWritable, Text> {
                     }
                 }
             }
-            FileStatus inpFile=listStatus(job.getJobConf())[0];
+            FileStatus inpFile=listStatus(job).get(0);
             Path path=inpFile.getPath();
             BufferedReader br=new BufferedReader(new InputStreamReader(filesystem.open(path)));
             int count=0;
@@ -104,6 +98,11 @@ public class DownloadInputFormat extends FileInputFormat<IntWritable, Text> {
             Logger.getLogger(DownloadInputFormat.class.getName()).log(Level.SEVERE, null, ex);
         }
         return splits;
+    }
+
+    @Override
+    public RecordReader<IntWritable, Text> createRecordReader(InputSplit is, TaskAttemptContext tac) throws IOException, InterruptedException {
+                return (RecordReader<IntWritable, Text>) new DownloadRecordReader();
     }
     
     

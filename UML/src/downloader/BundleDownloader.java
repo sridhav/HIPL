@@ -15,6 +15,7 @@ import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
@@ -25,20 +26,51 @@ import org.apache.hadoop.mapred.MapReduceBase;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
 
 /**
  *
  * @author LSAdmin
  */
-public class BundleDownloader {
+public class BundleDownloader  extends Configured implements Tool{
     static String filePath;
     static String filetype;
-    public BundleDownloader(String path, String type){
-        filePath=path;
-        filetype=type;
-    }
+    static String inpPath;
     
+    
+    @Override
+    public int run(String args[]) throws IOException, InterruptedException, ClassNotFoundException{
+        inpPath=args[0];
+        filePath=args[1];
+        filetype="seq";
+        if(args.length>2){
+            filetype=args[2];
+        }
+        
+        Configuration conf = new Configuration();
+        String outputPath = filePath.substring(0, filePath.lastIndexOf('/')+1);
+        System.out.println("Output HIB: " + outputPath);
+        
+        Job job = new Job(conf, "downloader");
+        job.setJarByClass(BundleDownloader.class);
+        job.setMapperClass(Map.class);
+        job.setReducerClass(DownloaderReducer.class);
+
+        job.setOutputKeyClass(BooleanWritable.class);
+        job.setOutputValueClass(Text.class);       
+        job.setInputFormatClass(DownloadInputFormat.class);
+
+        FileOutputFormat.setOutputPath(job, new Path(filePath + "_output"));
+
+        DownloadInputFormat.setInputPaths(job, new Path(inpPath));
+
+        job.setNumReduceTasks(1);
+        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        return 1;
+    }
     
     public static class Map extends Mapper<IntWritable, Text, BooleanWritable,Text>{
         public static Configuration conf;
@@ -48,14 +80,14 @@ public class BundleDownloader {
             conf=c.getConfiguration();
         }
         
-        public void map(IntWritable k1, Text v1, OutputCollector<BooleanWritable, Text> oc, Reporter rprtr) throws IOException {
+        public void map(IntWritable k1, Text v1, OutputCollector<BooleanWritable, Text> oc, Reporter rprtr) throws IOException, InterruptedException {
             String temppath=BundleDownloader.filePath+k1.get()+"."+BundleDownloader.filetype+".tmp";
             System.out.println(temppath);
             BundleWriter bw = null;
-            if(BundleDownloader.filetype=="seq"){
+            if("seq".equals(BundleDownloader.filetype)){
                 bw=new SequenceBundleWriter(new Path(temppath), conf);
             }
-            else if(BundleDownloader.filetype=="map"){
+            else if("map".equals(BundleDownloader.filetype)){
                 bw=new MapBundleWriter(new Path(temppath), conf);
             }
             else{
@@ -73,10 +105,10 @@ public class BundleDownloader {
                     bw.close();
                     oc.collect(new BooleanWritable(true), new Text(temppath));
                     temppath=BundleDownloader.filePath+i+".tmp";
-                    if(BundleDownloader.filetype=="seq"){
+                    if("seq".equals(BundleDownloader.filetype)){
                         bw=new SequenceBundleWriter(new Path(temppath), conf);
                     }
-                    else if(BundleDownloader.filetype=="map"){
+                    else if("map".equals(BundleDownloader.filetype)){
                         bw=new MapBundleWriter(new Path(temppath), conf);
                     }
                     else{
@@ -104,7 +136,7 @@ public class BundleDownloader {
                 end=System.currentTimeMillis();
                 
                 System.out.println("TOOK :"+(float)((end-start)/1000.0)+" seconds\n");
-               
+                Thread.sleep(1000);
                 reader.close();
                 bw.close();
                 
@@ -127,10 +159,10 @@ public class BundleDownloader {
             if(key.get()){
                 FileSystem fs=FileSystem.get(conf);
                 BundleWriter bw = null;
-                if(BundleDownloader.filetype=="seq"){
+                if("seq".equals(BundleDownloader.filetype)){
                     bw=new SequenceBundleWriter(new Path(BundleDownloader.filePath), conf);
                 }
-                else if(BundleDownloader.filetype=="map"){
+                else if("map".equals(BundleDownloader.filetype)){
                     bw=new MapBundleWriter(new Path(BundleDownloader.filePath), conf);
                 }
                 else{
@@ -145,7 +177,10 @@ public class BundleDownloader {
                 context.write(new BooleanWritable(true), new Text(bw.getBundleFile().getPath().toString()));
 		context.progress();
             }
-        }
-        
+        }    
     }
+    
+    
+    
+    
 }
