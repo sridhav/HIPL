@@ -33,7 +33,7 @@ public class HImage {
      * Constructor to create an HImage which holds the image and header data.
      * @param file - Generates HImage from a File.
      */
-    static{ 
+    /*static{ 
         if(System.getProperty("os.name").toLowerCase().contains("windows")){
             File x=new File("src/lib/x64/opencv_java249.dll");
             System.load(x.getAbsolutePath());
@@ -44,7 +44,7 @@ public class HImage {
         }
         System.out.println(System.getProperty("os.name"));
     }
-    
+    */
     private byte[] imagebytes=null;
     private BufferedImage bufferedImage=null;
     private Mat mat=null;

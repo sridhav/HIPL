@@ -153,14 +153,13 @@ public class Downloader extends Configured implements Tool{
 		throws IOException, InterruptedException
 		{
 			if(key.get()){
-				FileSystem fileSystem = FileSystem.get(conf);
+				
 				SequenceBundleWriter sbw = new SequenceBundleWriter(new Path(conf.get("downloader.outfile")), conf);
 			
 				for (Text temp_string : values) {
 					Path temp_path = new Path(temp_string.toString());
 					BundleFile bf=new BundleFile(temp_path,conf);
                                         sbw.appendBundle(bf);
-					
 					context.write(new BooleanWritable(true), new Text(sbw.getBundleFile().getPath().toString()));
 					context.progress();
 				}

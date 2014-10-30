@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
@@ -40,11 +39,14 @@ public final class SequenceBundleWriter implements BundleWriter{
     
     public SequenceBundleWriter(BundleFile file){
         _file=file;
+        openToWrite();
     }
     
     public SequenceBundleWriter(String path, Configuration conf){
         _hConf=new Config(path, conf);
         _file=new BundleFile(path,conf);
+        this.path=new Path(path);
+        this.conf=conf;
         openToWrite();
     }
     
@@ -53,26 +55,23 @@ public final class SequenceBundleWriter implements BundleWriter{
         _file=new BundleFile(path,conf);
         this.conf=conf;
         this.path=path;
-        
         openToWrite();
     }
     
     @Override
     public void openToWrite() {
         try {
-            if(path==null || conf==null){
-                Thread.sleep(100000);
+            if(conf==null || path==null){
+                System.out.println("Invalid Path or Conf");
             }
+            System.out.println(path.toString());
             Option opt1=SequenceFile.Writer.file(path);
             Option opt2=SequenceFile.Writer.keyClass(LongWritable.class);
             Option opt3=SequenceFile.Writer.valueClass(BytesWritable.class);
-            CompressionCodec Codec = new GzipCodec();
-            Option opt4 = SequenceFile.Writer.compression(CompressionType.RECORD,  Codec);
+            
             _seqWriter = SequenceFile.createWriter(conf,opt1,opt2,opt3);
             _seqTotal=1;
         } catch (IOException ex) {
-            Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
             Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -81,6 +80,7 @@ public final class SequenceBundleWriter implements BundleWriter{
     public void appendImage(HImage himage) {
         try {
             _seqWriter.append(new LongWritable(_seqTotal), new BytesWritable(himage.getImageBytes()));
+            _seqTotal++;
         } catch (IOException ex) {
             Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
