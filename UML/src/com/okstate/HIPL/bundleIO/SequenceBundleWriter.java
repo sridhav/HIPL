@@ -20,17 +20,24 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.SequenceFile.CompressionType;
+import org.apache.hadoop.io.SequenceFile.Writer.Option;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
 
 /**
  *
  * @author sridhar
  */
-public class SequenceBundleWriter implements BundleWriter{
+public final class SequenceBundleWriter implements BundleWriter{
 
     private SequenceFile.Writer _seqWriter;
     private Config _hConf;
     private long _seqTotal=0;
     private BundleFile _file;
+    private Configuration conf;
+    private Path path;
+    
     public SequenceBundleWriter(BundleFile file){
         _file=file;
     }
@@ -44,15 +51,28 @@ public class SequenceBundleWriter implements BundleWriter{
     public SequenceBundleWriter(Path path, Configuration conf){
         _hConf=new Config(path, conf);
         _file=new BundleFile(path,conf);
+        this.conf=conf;
+        this.path=path;
+        
         openToWrite();
     }
     
     @Override
     public void openToWrite() {
         try {
-            _seqWriter = SequenceFile.createWriter(_hConf.getFileSystem(), _hConf.getConfiguration(), _hConf.getPath(), LongWritable.class, BytesWritable.class);
+            if(path==null || conf==null){
+                Thread.sleep(100000);
+            }
+            Option opt1=SequenceFile.Writer.file(path);
+            Option opt2=SequenceFile.Writer.keyClass(LongWritable.class);
+            Option opt3=SequenceFile.Writer.valueClass(BytesWritable.class);
+            CompressionCodec Codec = new GzipCodec();
+            Option opt4 = SequenceFile.Writer.compression(CompressionType.RECORD,  Codec);
+            _seqWriter = SequenceFile.createWriter(conf,opt1,opt2,opt3);
             _seqTotal=1;
         } catch (IOException ex) {
+            Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
