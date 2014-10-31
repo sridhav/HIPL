@@ -47,17 +47,20 @@ public class Downloader extends Configured implements Tool{
 	{
 		private static Configuration conf;
 		// This method is called on every node
+                @Override
 		public void setup(Context jc) throws IOException
 		{
 			conf = jc.getConfiguration(); 
 		}
 
+                @Override
 		public void map(IntWritable key, Text value, Context context) 
 		throws IOException, InterruptedException
 		{
-			String temp_path = conf.get("downloader.outpath") + key.get() + ".hib.tmp";
+			String temp_path = conf.get("downloader.outpath") + key.get() + ".tmp";
 			System.out.println("Temp path: " + temp_path);
-			
+			conf.set("mapred.map.child.java.opts", "-Xmx5000m");
+                        conf.set("mapred.reduce.child.java.opts", "-Xmx5000m");
 			SequenceBundleWriter sbw=new SequenceBundleWriter(temp_path, conf);
 
 			String word = value.toString();
@@ -65,16 +68,9 @@ public class Downloader extends Configured implements Tool{
 			BufferedReader reader = new BufferedReader(new StringReader(word));
 			String uri;
 			int i = key.get();
-			int iprev = i;
 			while((uri = reader.readLine()) != null)			
 			{
-				if(i >= iprev+100) {
-					sbw.close();
-					context.write(new BooleanWritable(true), new Text(temp_path));
-					temp_path = conf.get("downloader.outpath") + i + ".hib.tmp";
-					sbw = new SequenceBundleWriter(new Path(temp_path), conf);
-					iprev = i;
-				}
+				
 				long startT=0;
 				long stopT=0;	   
 				startT = System.currentTimeMillis();	    	    
@@ -144,31 +140,34 @@ public class Downloader extends Configured implements Tool{
 	public static class DownloaderReducer extends Reducer<BooleanWritable, Text, BooleanWritable, Text> {
 
 		private static Configuration conf;		
+                @Override
 		public void setup(Context jc) throws IOException
 		{
 			conf = jc.getConfiguration();
 		}
 
+                @Override
 		public void reduce(BooleanWritable key, Iterable<Text> values, Context context) 
 		throws IOException, InterruptedException
 		{
 			if(key.get()){
-				
 				SequenceBundleWriter sbw = new SequenceBundleWriter(new Path(conf.get("downloader.outfile")), conf);
 			
 				for (Text temp_string : values) {
 					Path temp_path = new Path(temp_string.toString());
-					BundleFile bf=new BundleFile(temp_path,conf);
-                                        sbw.appendBundle(bf);
+					//BundleFile bf=new BundleFile(temp_path,conf);
+                                        sbw.appendBundle(temp_path,conf);
 					context.write(new BooleanWritable(true), new Text(sbw.getBundleFile().getPath().toString()));
 					context.progress();
 				}
+                                //sbw.appendBundle(new Path(conf.get("downloader.outpath")),conf);
 				sbw.close();
 			}
 		}
 	}
 
 
+        @Override
 	public int run(String[] args) throws Exception
 	{	
 
@@ -197,7 +196,7 @@ public class Downloader extends Configured implements Tool{
 		Job job = new Job(conf, "downloader");
 		job.setJarByClass(Downloader.class);
 		job.setMapperClass(DownloaderMapper.class);
-		job.setReducerClass(DownloaderReducer.class);
+                job.setReducerClass(DownloaderReducer.class);
 
 		// Set formats
 		job.setOutputKeyClass(BooleanWritable.class);

@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
@@ -121,16 +122,10 @@ public final class SequenceBundleWriter implements BundleWriter{
 
     @Override
     public void appendBundle(Path path,Configuration conf) {
-        try {
-            System.out.println("MERGE STARTED: "+_hConf.getPath()+" and "+path +":"+System.currentTimeMillis());
-            long start=System.currentTimeMillis();
-            FileUtil.copyMerge(_hConf.getFileSystem(), _file.getPath(), _hConf.getFileSystem(), path, true, null, null);
-            long end=System.currentTimeMillis();
-            System.out.println("MERGE ENDED : "+_hConf.getPath()+" and "+path+" in "+(end-start)+" ms");
-        
-        } catch (IOException ex) {
-            Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println("MERGE STARTED: "+_hConf.getPath()+" and "+path +":"+System.currentTimeMillis());
+        long start=System.currentTimeMillis();
+        long end=System.currentTimeMillis();
+        System.out.println("MERGE ENDED : "+_hConf.getPath()+" and "+path+" in "+(end-start)+" ms");
         
     }
     
