@@ -122,20 +122,22 @@ public final class SequenceBundleWriter implements BundleWriter{
 
     @Override
     public void appendBundle(Path path,Configuration conf) {
+        try {
         System.out.println("MERGE STARTED: "+_hConf.getPath()+" and "+path +":"+System.currentTimeMillis());
         long start=System.currentTimeMillis();
         SequenceBundleReader reader=new SequenceBundleReader(path,conf);
         while(reader.hasNext()){
-            try {
-                _seqWriter.append(_seqTotal, reader.getValue());
+                _seqWriter.append(new LongWritable(_seqTotal), reader.getValue());
                 _seqTotal++;
-            } catch (IOException ex) {
-                Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        reader.close();
+        FileSystem fs=FileSystem.get(conf);
+        fs.delete(path, true);
         long end=System.currentTimeMillis();
         System.out.println("MERGE ENDED : "+_hConf.getPath()+" and "+path+" in "+(end-start)+" ms");
-        
+         } catch (IOException ex) {
+                Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
+            }
     }
     
     public void appendBundle(BundleFile file){

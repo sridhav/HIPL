@@ -68,9 +68,16 @@ public class Downloader extends Configured implements Tool{
 			BufferedReader reader = new BufferedReader(new StringReader(word));
 			String uri;
 			int i = key.get();
+                        int iprev=i;
 			while((uri = reader.readLine()) != null)			
 			{
-				
+				if(i >= iprev+100) {
+                                        sbw.close();
+					context.write(new BooleanWritable(true), new Text(sbw.getBundleFile().getPath().toString()));
+					temp_path = conf.get("downloader.outpath") + i + ".tmp";
+					sbw = new SequenceBundleWriter(new Path(temp_path), conf);
+					iprev = i;
+				}
 				long startT=0;
 				long stopT=0;	   
 				startT = System.currentTimeMillis();	    	    
@@ -196,7 +203,7 @@ public class Downloader extends Configured implements Tool{
 		job.setJarByClass(Downloader.class);
 		job.setMapperClass(DownloaderMapper.class);
                 job.setReducerClass(DownloaderReducer.class);
-
+                job.setNumReduceTasks(1);
 		// Set formats
 		job.setOutputKeyClass(BooleanWritable.class);
 		job.setOutputValueClass(Text.class);       

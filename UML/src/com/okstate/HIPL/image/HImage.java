@@ -6,6 +6,7 @@ import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.okstate.HIPL.header.HImageHeader;
+import com.okstate.HIPL.util.NativeUtil;
 
 
 import java.awt.image.BufferedImage;
@@ -33,18 +34,25 @@ public class HImage {
      * Constructor to create an HImage which holds the image and header data.
      * @param file - Generates HImage from a File.
      */
-    /*static{ 
+    static{ 
         if(System.getProperty("os.name").toLowerCase().contains("windows")){
-            File x=new File("src/lib/x64/opencv_java249.dll");
-            System.load(x.getAbsolutePath());
+            try {
+                
+                NativeUtil.loadFromJar("/lib/x86/opencv_java249.dll");
+            } catch (IOException ex) {
+                Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         else if(System.getProperty("os.name").toLowerCase().contains("linux")){
-            File x=new File("src/lib/libopencv_java249.so");
-            System.load(x.getAbsolutePath());
+            try {
+                NativeUtil.loadFromJar("/lib/x86/libopencv_java249.so");
+            } catch (IOException ex) {
+                Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         System.out.println(System.getProperty("os.name"));
     }
-    */
+    
     private byte[] imagebytes=null;
     private BufferedImage bufferedImage=null;
     private Mat mat=null;
