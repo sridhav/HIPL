@@ -152,7 +152,6 @@ public class Downloader extends Configured implements Tool{
 		{
 			if(key.get()){
 				SequenceBundleWriter sbw = new SequenceBundleWriter(new Path(conf.get("downloader.outfile")), conf);
-			
 				for (Text temp_string : values) {
 					Path temp_path = new Path(temp_string.toString());
 					//BundleFile bf=new BundleFile(temp_path,conf);

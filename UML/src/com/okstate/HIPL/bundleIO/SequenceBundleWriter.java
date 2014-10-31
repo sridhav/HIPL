@@ -124,6 +124,15 @@ public final class SequenceBundleWriter implements BundleWriter{
     public void appendBundle(Path path,Configuration conf) {
         System.out.println("MERGE STARTED: "+_hConf.getPath()+" and "+path +":"+System.currentTimeMillis());
         long start=System.currentTimeMillis();
+        SequenceBundleReader reader=new SequenceBundleReader(path,conf);
+        while(reader.hasNext()){
+            try {
+                _seqWriter.append(_seqTotal, reader.getValue());
+                _seqTotal++;
+            } catch (IOException ex) {
+                Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         long end=System.currentTimeMillis();
         System.out.println("MERGE ENDED : "+_hConf.getPath()+" and "+path+" in "+(end-start)+" ms");
         

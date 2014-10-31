@@ -29,6 +29,7 @@ public class SequenceBundleReader implements BundleReader{
     private BundleFile _file;
     long _tempKey;
     HImage _tempImage;
+    private BytesWritable _tempImageBytes;
     
     public SequenceBundleReader(BundleFile file){
         _file=file;
@@ -63,6 +64,7 @@ public class SequenceBundleReader implements BundleReader{
             
             if(_seqReader.next(key,image)){
                 _tempKey=key.get();   
+                _tempImageBytes=image;
                 _tempImage=new HImage(image.getBytes());
                 return true;
             }
@@ -97,5 +99,9 @@ public class SequenceBundleReader implements BundleReader{
     @Override
     public Config getConfiguration() {
         return _hConf;
+    }
+    
+    public BytesWritable getValue(){
+        return _tempImageBytes;
     }
 }
