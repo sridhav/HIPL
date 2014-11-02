@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opencv.core.Mat;
 
 /**
  *
@@ -29,43 +30,45 @@ public class NativeUtil {
         String filename=(parts.length>1)?parts[parts.length-1]:null;
         String prefix="";
         String suffix=null;
-        Logger.getLogger("FILENAME "+filename).log(Level.WARNING, null, filename);
-        //System.out.println(filename);
+        //Logger.getLogger("FILENAME "+filename).log(Level.WARNING, null, filename);
+        System.out.println(filename);
         if (filename != null) {
-            parts = filename.split(".");
+            parts = filename.split("\\.");
             prefix = parts[0];
-            suffix = (parts.length < 1) ? "."+parts[parts.length - 1] : null;
+            suffix = (parts.length > 1) ? "."+parts[parts.length - 1] : null;
         }
-         Logger.getLogger("parts "+parts.length).log(Level.WARNING, null, filename);
+        System.out.println(prefix);
+        System.out.println(suffix);
+        // Logger.getLogger("parts "+parts.length).log(Level.WARNING, null, filename);
         File temp=File.createTempFile(prefix, suffix);
-        temp.deleteOnExit();
+       // temp.deleteOnExit();
         
-        byte[] buffer =new byte[1024];
-        int read;
+       
         
         InputStream is=NativeUtil.class.getResourceAsStream(path);
-         Logger.getLogger("parts "+NativeUtil.class.getCanonicalName()).log(Level.WARNING, null, filename);
+         //Logger.getLogger("parts "+NativeUtil.class.getCanonicalName()).log(Level.WARNING, null, filename);
          
         if (is == null) {
             throw new FileNotFoundException("File " + path + " was not found inside JAR.");
         }
-        
+        System.out.println(is.available());
+        byte[] buffer =new byte[is.available()];
+        int read; 
         OutputStream os=new FileOutputStream(temp);
         if(is!=null){
-            while((read=is.read())!=-1){
+            while((read=is.read(buffer))!=-1){
                 os.write(buffer,0,read);
             }
             os.close();
             is.close();
         }
+        System.out.println(temp.getAbsolutePath());
         System.load(temp.getAbsolutePath());
+     //   Mat x;
     }
     
     public static void main(String args[]) throws IOException{
-        InputStream x=(NativeUtil.class.getResourceAsStream("lib/x86/opencv_java249.dll"));
-        
-       
-        NativeUtil.loadFromJar("./src/lib/x86/opencv_java249.dll");
+        loadFromJar("/lib/x64/opencv_java249.dll");
     }
     
 }
