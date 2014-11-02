@@ -68,7 +68,7 @@ public class NativeUtil {
     }
     
     public static void main(String args[]) throws IOException{
-        loadFromJar("/lib/x64/opencv_java249.dll");
+       // loadFromJar("/lib/x64/opencv_java249.dll");
     }
     
 }

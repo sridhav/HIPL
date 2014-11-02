@@ -34,18 +34,20 @@ public class HImage {
      * Constructor to create an HImage which holds the image and header data.
      * @param file - Generates HImage from a File.
      */
+    static boolean loaded=false;
+    
     static{ 
         if(System.getProperty("os.name").toLowerCase().contains("windows")){
             try {
                 
-                NativeUtil.loadFromJar("/lib/x86/opencv_java249.dll");
+                NativeUtil.loadFromJar("/lib/x64/opencv_java249.dll");
             } catch (IOException ex) {
                 Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         else if(System.getProperty("os.name").toLowerCase().contains("linux")){
             try {
-                NativeUtil.loadFromJar("/lib/x86/libopencv_java249.so");
+                NativeUtil.loadFromJar("/lib/x64/libopencv_java249.so");
             } catch (IOException ex) {
                 Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
             }
