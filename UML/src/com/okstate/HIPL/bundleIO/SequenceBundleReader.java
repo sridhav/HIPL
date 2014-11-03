@@ -28,39 +28,35 @@ public class SequenceBundleReader implements BundleReader{
     private long _seqTotal=0;
     private Config _hConf;
     private BundleFile _file;
-     private Configuration conf;
-    private Path path;
     long _tempKey;
     HImage _tempImage;
     private BytesWritable _tempImageBytes;
     
     public SequenceBundleReader(BundleFile file){
         _file=file;
+        _hConf=file.getHConfig();
+        openToRead();
     }
     
     public SequenceBundleReader(String path, Configuration conf){
         _hConf=new Config(path,conf);
         _file=new BundleFile(path, conf);
-        this.path=new Path(path);
-        this.conf=conf;
         openToRead();
     }
     
     public SequenceBundleReader(Path path, Configuration conf){
         _hConf=new Config(path,conf);
         _file=new BundleFile(path, conf);
-        this.path=path;
-        this.conf=conf;
         openToRead();
     }
     
     @Override
     public void openToRead() {
         try {
-            Option opt1=SequenceFile.Reader.file(path);
+            Option opt1=SequenceFile.Reader.file(_hConf.getPath());
             //Option opt2=SequenceFile.Reader.keyClass(LongWritable.class);
             //Option opt3=SequenceFile.Writer.valueClass(BytesWritable.class);
-            _seqReader=new SequenceFile.Reader(conf,opt1);
+            _seqReader=new SequenceFile.Reader(_hConf.getConfiguration(),opt1);
             
            // _seqReader=new SequenceFile.Reader(_hConf.getFileSystem(), _hConf.getPath(), _hConf.getConfiguration());
         } catch (IOException ex) {

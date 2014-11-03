@@ -1,7 +1,8 @@
 package com.okstate.HIPL.exdown;
 
 
-import com.okstate.HIPL.bundle.BundleFile;
+import com.okstate.HIPL.bundleIO.BundleWriter;
+import com.okstate.HIPL.bundleIO.MapBundleWriter;
 import com.okstate.HIPL.bundleIO.SequenceBundleWriter;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,13 +57,27 @@ public class Downloader extends Configured implements Tool{
                 @Override
 		public void map(IntWritable key, Text value, Context context) 
 		throws IOException, InterruptedException
-		{
-			String temp_path = conf.get("downloader.outpath") + key.get() + ".tmp";
-			System.out.println("Temp path: " + temp_path);
+		{       
+                        MapBundleWriter sbw;
+                      /*  if(conf.get("downloader.outtype").equals("map")){
+                            String temp_path=conf.get("downloader.outpath")+key.get()+"_temp/";
+                            createDir(temp_path, conf);
+                            System.out.println("Outpath :"+temp_path);
+                            bw=new MapBundleWriter(temp_path,conf);
+                        }
+                        
+                        if(conf.get("downloader.outtype").equals("seq")){
+                            
+                        }
+                    */
+                       String temp_path = conf.get("downloader.outpath") + key.get() + ".tmp/";
+                       System.out.println("Temp path: " + temp_path);
+                       sbw=new MapBundleWriter(temp_path,conf);
+
+                    
 			conf.set("mapred.map.child.java.opts", "-Xmx5000m");
                         conf.set("mapred.reduce.child.java.opts", "-Xmx5000m");
-			SequenceBundleWriter sbw=new SequenceBundleWriter(temp_path, conf);
-
+		
 			String word = value.toString();
 
 			BufferedReader reader = new BufferedReader(new StringReader(word));
@@ -74,8 +89,8 @@ public class Downloader extends Configured implements Tool{
 				if(i >= iprev+100) {
                                         sbw.close();
 					context.write(new BooleanWritable(true), new Text(sbw.getBundleFile().getPath().toString()));
-					temp_path = conf.get("downloader.outpath") + i + ".tmp";
-					sbw = new SequenceBundleWriter(new Path(temp_path), conf);
+					temp_path = conf.get("downloader.outpath") + i + ".tmp/";
+					sbw = new MapBundleWriter(new Path(temp_path), conf);
 					iprev = i;
 				}
 				long startT=0;
@@ -158,7 +173,7 @@ public class Downloader extends Configured implements Tool{
 		throws IOException, InterruptedException
 		{
 			if(key.get()){
-				SequenceBundleWriter sbw = new SequenceBundleWriter(new Path(conf.get("downloader.outfile")), conf);
+				MapBundleWriter sbw = new MapBundleWriter(new Path(conf.get("downloader.outfile")+"/"), conf);
 				for (Text temp_string : values) {
 					Path temp_path = new Path(temp_string.toString());
 					//BundleFile bf=new BundleFile(temp_path,conf);
@@ -180,7 +195,7 @@ public class Downloader extends Configured implements Tool{
 		// Read in the configuration file
 		if (args.length < 3)
 		{
-			System.out.println("Usage: downloader <input file> <output file> <nodes>");
+			System.out.println("Usage: downloader <input file> <output file> <nodes> <outtype>");
 			System.exit(0);
 		}
 
@@ -190,7 +205,8 @@ public class Downloader extends Configured implements Tool{
 		String inputFile = args[0];
 		String outputFile = args[1];
 		int nodes = Integer.parseInt(args[2]);
-
+                //String outType=args[3];
+                
 		String outputPath = outputFile.substring(0, outputFile.lastIndexOf('/')+1);
 		System.out.println("Output HIB: " + outputPath);
 		
@@ -198,6 +214,7 @@ public class Downloader extends Configured implements Tool{
 		conf.setInt("downloader.nodes", nodes);
 		conf.setStrings("downloader.outfile", outputFile);
 		conf.setStrings("downloader.outpath", outputPath);
+               // conf.setStrings("downloader.outtype", outType);
 
 		Job job = new Job(conf, "downloader");
 		job.setJarByClass(Downloader.class);

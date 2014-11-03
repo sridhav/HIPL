@@ -15,15 +15,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
-import org.apache.hadoop.io.SequenceFile.CompressionType;
+
 import org.apache.hadoop.io.SequenceFile.Writer.Option;
-import org.apache.hadoop.io.compress.CompressionCodec;
-import org.apache.hadoop.io.compress.GzipCodec;
+
 
 /**
  *
@@ -35,42 +33,33 @@ public final class SequenceBundleWriter implements BundleWriter{
     private Config _hConf;
     private long _seqTotal=0;
     private BundleFile _file;
-    private Configuration conf;
-    private Path path;
+
     
     public SequenceBundleWriter(BundleFile file){
         _file=file;
+        _hConf=file.getHConfig();
         openToWrite();
     }
     
     public SequenceBundleWriter(String path, Configuration conf){
         _hConf=new Config(path, conf);
         _file=new BundleFile(path,conf);
-        this.path=new Path(path);
-        this.conf=conf;
         openToWrite();
     }
     
     public SequenceBundleWriter(Path path, Configuration conf){
         _hConf=new Config(path, conf);
         _file=new BundleFile(path,conf);
-        this.conf=conf;
-        this.path=path;
         openToWrite();
     }
     
     @Override
     public void openToWrite() {
-        try {
-            if(conf==null || path==null){
-                System.out.println("Invalid Path or Conf");
-            }
-            System.out.println(path.toString());
-            Option opt1=SequenceFile.Writer.file(path);
+        try {   
+            Option opt1=SequenceFile.Writer.file(_hConf.getPath());
             Option opt2=SequenceFile.Writer.keyClass(LongWritable.class);
             Option opt3=SequenceFile.Writer.valueClass(BytesWritable.class);
-            
-            _seqWriter = SequenceFile.createWriter(conf,opt1,opt2,opt3);
+            _seqWriter = SequenceFile.createWriter(_hConf.getConfiguration(),opt1,opt2,opt3);
             _seqTotal=1;
         } catch (IOException ex) {
             Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);

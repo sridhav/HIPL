@@ -5,6 +5,7 @@
  */
 package com.okstate.HIPL.bundle;
 
+import com.okstate.HIPL.util.Config;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 
@@ -26,7 +27,9 @@ public class BundleFile {
     }
 
   
-    
+    public Config getHConfig(){
+        return new Config(_filepath,_conf);
+    } 
     public String getName(){
         return null;
     }

@@ -16,6 +16,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.MapFile;
+import org.apache.hadoop.io.Writable;
 
 /**
  *
@@ -28,9 +29,12 @@ public class MapBundleReader implements BundleReader{
     private long _tempKey;
     private HImage _tempImage;
     private BundleFile _file;
+    private BytesWritable _tempBytes;
     
     public MapBundleReader(BundleFile file){
         _file=file;
+        _hConf=file.getHConfig();
+        openToRead();
     }
     
     public MapBundleReader(String path, Configuration conf){
@@ -48,7 +52,7 @@ public class MapBundleReader implements BundleReader{
     @Override
     public void openToRead() {
         try {
-            _mapReader=new MapFile.Reader(_hConf.getFileSystem(), _hConf.getPath().toString(), _hConf.getConfiguration());
+            _mapReader=new MapFile.Reader(_hConf.getPath(),_hConf.getConfiguration());
             _totalCount=1;
         } catch (IOException ex) {
             Logger.getLogger(MapBundleReader.class.getName()).log(Level.SEVERE, null, ex);
@@ -63,6 +67,7 @@ public class MapBundleReader implements BundleReader{
             
             if(_mapReader.next(key,image)){
                 _tempKey=key.get();   
+                _tempBytes=image;
                 _tempImage=new HImage(image.getBytes());
                 return true;
             }
@@ -97,6 +102,10 @@ public class MapBundleReader implements BundleReader{
         } catch (IOException ex) {
             Logger.getLogger(SequenceBundleReader.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    BytesWritable getValue() {
+        return _tempBytes;
     }
     
 }
