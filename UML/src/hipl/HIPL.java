@@ -6,6 +6,7 @@
 package hipl;
 
 import com.okstate.HIPL.exdown.Downloader;
+import com.okstate.HIPL.extract.ImageExtractor;
 import downloader.BundleDownloader;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -25,7 +26,9 @@ public class HIPL {
     public static void main(String[] args) throws Exception {
         try {
             // TODO code application logic here
-           ToolRunner.run((Tool) new Downloader(), args);
+           //ToolRunner.run((Tool) new Downloader(), args);
+           ToolRunner.run((Tool) new ImageExtractor(), args);
+           
         } catch (IOException ex) {
             Logger.getLogger(HIPL.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
