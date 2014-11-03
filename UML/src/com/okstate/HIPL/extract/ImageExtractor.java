@@ -7,6 +7,7 @@
 package com.okstate.HIPL.extract;
 
 import com.okstate.HIPL.bundleIO.SequenceBundleReader;
+import com.okstate.HIPL.image.HImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 
@@ -53,21 +55,23 @@ public class ImageExtractor extends Configured implements Tool {
         public void map(LongWritable key, BytesWritable value, Context context) throws IOException, InterruptedException{
             path=new Path(conf.get("inputpath"));
             outdir=new Path(conf.get("outdir"));
-            SequenceBundleReader sbr=new SequenceBundleReader(path, conf);
-            int count=0;
+           
+            
             Path temp=null;
-          FileSystem local = FileSystem.getLocal(conf);
+            FileSystem local = FileSystem.getLocal(conf);
             FSDataOutputStream out=null;
-            while(sbr.hasNext()){ 
-                temp=new Path(conf.get("outdir")+count+".jpg");
+            
+            if(value!=null){
+                temp=new Path(conf.get("outdir")+key+".jpg");
                 out=local.create(temp);
-                value=sbr.getValue();
                 out.write(value.getBytes());
-                context.write(new BooleanWritable(true),new Text("val"+count));
-                count++;
-                out.flush();
-                out.close();
+                context.write(new BooleanWritable(true),new Text("val"+key));
+                
+                out.hflush();
+                out.hsync();
+                out.close(); 
             }
+            
         }
     }
     

@@ -2,6 +2,7 @@ package com.okstate.HIPL.exdown;
 
 
 import com.okstate.HIPL.bundleIO.MapBundleWriter;
+import com.okstate.HIPL.bundleIO.SequenceBundleWriter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -56,7 +57,7 @@ public class Downloader extends Configured implements Tool{
 		public void map(IntWritable key, Text value, Context context) 
 		throws IOException, InterruptedException
 		{       
-                        MapBundleWriter sbw;
+                        SequenceBundleWriter sbw;
                       /*  if(conf.get("downloader.outtype").equals("map")){
                             String temp_path=conf.get("downloader.outpath")+key.get()+"_temp/";
                             createDir(temp_path, conf);
@@ -68,9 +69,9 @@ public class Downloader extends Configured implements Tool{
                             
                         }
                     */
-                       String temp_path = conf.get("downloader.outpath") + key.get() + ".tmp/";
+                       String temp_path = conf.get("downloader.outpath") + key.get() + ".tmp";
                        System.out.println("Temp path: " + temp_path);
-                       sbw=new MapBundleWriter(temp_path,conf);
+                       sbw=new SequenceBundleWriter(temp_path,conf);
 
                     
 			conf.set("mapred.map.child.java.opts", "-Xmx5000m");
@@ -87,8 +88,8 @@ public class Downloader extends Configured implements Tool{
 				if(i >= iprev+100) {
                                         sbw.close();
 					context.write(new BooleanWritable(true), new Text(sbw.getBundleFile().getPath().toString()));
-					temp_path = conf.get("downloader.outpath") + i + ".tmp/";
-					sbw = new MapBundleWriter(new Path(temp_path), conf);
+					temp_path = conf.get("downloader.outpath") + i + ".tmp";
+					sbw = new SequenceBundleWriter(new Path(temp_path), conf);
 					iprev = i;
 				}
 				long startT=0;
@@ -171,7 +172,7 @@ public class Downloader extends Configured implements Tool{
 		throws IOException, InterruptedException
 		{
 			if(key.get()){
-				MapBundleWriter sbw = new MapBundleWriter(new Path(conf.get("downloader.outfile")+"/"), conf);
+				SequenceBundleWriter sbw = new SequenceBundleWriter(new Path(conf.get("downloader.outfile")), conf);
 				for (Text temp_string : values) {
 					Path temp_path = new Path(temp_string.toString());
 					//BundleFile bf=new BundleFile(temp_path,conf);

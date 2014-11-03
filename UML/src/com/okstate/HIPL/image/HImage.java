@@ -84,17 +84,16 @@ public class HImage {
      * @param inputstream - Generates HImage from InputStream.
      */
     public HImage(InputStream inputstream){
-        ByteArrayOutputStream baos=null;
-        byte buffer[]=new byte[4096];
-        int read=0;
         try {
-            baos=new ByteArrayOutputStream();
-            while ((read = inputstream.read(buffer)) != -1) {
-                baos.write(buffer);
+            ByteArrayOutputStream baos=new ByteArrayOutputStream();
+            byte buffer[]=new byte[1024];
+            int read=0;
+            while((read=inputstream.read(buffer))>-1){
+                baos.write(buffer,0,read);
             }
             imagebytes=baos.toByteArray();
-        } catch (IOException e) {
-            System.out.println("IO NOT FOUND");
+        } catch (IOException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     /**
