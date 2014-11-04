@@ -7,6 +7,7 @@ package hipl;
 
 import com.okstate.HIPL.exdown.Downloader;
 import com.okstate.HIPL.extract.ImageExtractor;
+import com.okstate.HIPL.process.ImageProcess;
 import downloader.BundleDownloader;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -23,11 +24,19 @@ public class HIPL {
     /**
      * @param args the command line arguments
      */
+    @SuppressWarnings("empty-statement")
     public static void main(String[] args) throws Exception {
         try {
             // TODO code application logic here
-           //ToolRunner.run((Tool) new Downloader(), args);
-           ToolRunner.run((Tool) new ImageExtractor(), args);
+           String myargs[]={"/user/cloudera/urls/input","/user/cloudera/urls/outex/img.tmp","1"};
+           ToolRunner.run((Tool) new Downloader(), myargs);
+           
+           String myargs2[]={"/user/cloudera/urls/outex/img.tmp","com.okstate.HIPL.process.GrayAlgorithm"};
+           ToolRunner.run((Tool) new ImageProcess(), myargs2);
+           
+           String myargs3[]={"/user/cloudera/urls/outex/img.tmp","/tmp/imgs/"};
+           ToolRunner.run((Tool) new ImageExtractor(), myargs3);
+         
            
         } catch (IOException ex) {
             Logger.getLogger(HIPL.class.getName()).log(Level.SEVERE, null, ex);

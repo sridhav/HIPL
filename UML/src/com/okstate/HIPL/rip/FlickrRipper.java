@@ -81,7 +81,7 @@ public class FlickrRipper implements Ripper {
                   //  PoolsInterface x=_flickr.getPoolsInterface();
                    // PhotoList pl=x.getPhotos(,null, 1000, 1);
                     
-                    urls.add(photo.getLargeUrl());
+                    urls.add(photo.getOriginalUrl());
                     
                     
                 }
@@ -126,22 +126,22 @@ public class FlickrRipper implements Ripper {
         
     }
     
-    public static void main(String[] args){
+    public static void main(String[] args) throws FlickrException{
         
             FlickrRipper rip=new FlickrRipper("273d4e4538bc7650a9049e6dc9b6b476", "db2e4a9d2866485c","125815714@N07",new File("flickr"));
-            /*String arr[]={"space","dog","cat","stick","bug","world","geo"};
+            /*String arr[]={"birds","animals"};
             for(int i=0;i<arr.length;i++){
                 String temp[]={arr[i]};
                 rip.search(temp);
             }
-            rip.writeURLFile(new File("urls.txt"));
+            rip.writeURLFile(new File("urls2.txt"));
         */
-           /* String grps[]={"24662369@N07","61933023@N00"};
+            String grps[]={"1408810@N24"};
             rip.getGroupPools(grps);
-            rip.writeURLFile(new File("bigurls.txt"));
-        */
-            rip.getUserPool("24662369@N07");
-            rip.writeURLFile(new File("gsfc.txt"));
+           rip.writeURLFile(new File("birds.txt"));
+        
+        /*   rip.getUserPool("1408810@N24");
+            rip.writeURLFile(new File("birds.txt"));*/
     }
     private void getUserPools(String[] usrs){
         for(int i=0;i<usrs.length;i++){

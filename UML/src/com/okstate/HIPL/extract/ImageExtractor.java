@@ -61,7 +61,7 @@ public class ImageExtractor extends Configured implements Tool {
             FileSystem local = FileSystem.getLocal(conf);
             FSDataOutputStream out=null;
             
-            if(value!=null){
+           
                 temp=new Path(conf.get("outdir")+key+".jpg");
                 out=local.create(temp);
                 out.write(value.getBytes());
@@ -70,7 +70,6 @@ public class ImageExtractor extends Configured implements Tool {
                 out.hflush();
                 out.hsync();
                 out.close(); 
-            }
             
         }
     }
@@ -102,7 +101,7 @@ public class ImageExtractor extends Configured implements Tool {
         job.setMapOutputKeyClass(BooleanWritable.class);
         job.setMapOutputValueClass(Text.class);
         
-        FileOutputFormat.setOutputPath(job, new Path(strings[0]+"_out"));
+        FileOutputFormat.setOutputPath(job, new Path(strings[0]+"_ext"));
         
         FileInputFormat.addInputPath(job, new Path(strings[0]));
         

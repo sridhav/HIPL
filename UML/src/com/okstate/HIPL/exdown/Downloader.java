@@ -233,8 +233,8 @@ public class Downloader extends Configured implements Tool{
 		DownloaderInputFormat.setInputPaths(job, new Path(inputFile));
 
 		job.setNumReduceTasks(1);
-		System.exit(job.waitForCompletion(true) ? 0 : 1);
-		return 0;
+		return job.waitForCompletion(true) ? 0 : 1;
+		
 	}
 
 	public static void createDir(String path, Configuration conf) throws IOException {
