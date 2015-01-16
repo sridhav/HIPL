@@ -31,19 +31,22 @@ public class GrayAlgorithm implements GenericAlgorithm{
             int width=bf.getWidth();
             int height=bf.getHeight();
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
+            Color c;
             for(int i=0; i<height; i++){
                 for(int j=0; j<width; j++){
-                    Color c = new Color(bf.getRGB(j, i));
+                    c = new Color(bf.getRGB(j, i));
                     int red = (int)(c.getRed() * 0.299);
                     int green = (int)(c.getGreen() * 0.587);
                     int blue = (int)(c.getBlue() *0.114);
-                    Color newColor = new Color(red+green+blue,
+                    c = new Color(red+green+blue,
                             red+green+blue,red+green+blue);
-                    bf.setRGB(j,i,newColor.getRGB());
+                    bf.setRGB(j,i,c.getRGB());
                 }
             }
             ImageIO.write(bf, "jpg", baos);
-            himage=new HImage(baos.toByteArray());
+            HImage temp=new HImage(baos.toByteArray());
+            temp.setImageHeader(himage.getImageHeader());
+            himage=temp;
         } catch (IOException ex) {
             Logger.getLogger(GrayAlgorithm.class.getName()).log(Level.SEVERE, null, ex);
         }

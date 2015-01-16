@@ -33,8 +33,7 @@ public final class SequenceBundleWriter implements BundleWriter{
     private Config _hConf;
     private long _seqTotal=0;
     private BundleFile _file;
-
-    
+      
     public SequenceBundleWriter(BundleFile file){
         _file=file;
         _hConf=file.getHConfig();
@@ -69,8 +68,10 @@ public final class SequenceBundleWriter implements BundleWriter{
     @Override
     public void appendImage(HImage himage) {
         try {
-            _seqWriter.append(new LongWritable(_seqTotal), new BytesWritable(himage.getImageBytes()));
-            _seqTotal++;
+            if(himage.getImageBytes()!=null){
+                _seqWriter.append(new LongWritable(_seqTotal), new BytesWritable(himage.getImageBytes()));
+                _seqTotal++;
+            }
         } catch (IOException ex) {
             Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -128,7 +129,6 @@ public final class SequenceBundleWriter implements BundleWriter{
                 Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
             }
     }
-    
     public void appendBundle(BundleFile file){
         appendBundle(file.getPath(),file.getConfiguration());
     }

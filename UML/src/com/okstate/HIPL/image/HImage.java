@@ -17,12 +17,20 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.IIOImage;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReadParam;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.tools.FileObject;
 
 import org.opencv.core.Core;
@@ -58,6 +66,7 @@ public class HImage {
     private byte[] imagebytes=null;
     private BufferedImage bufferedImage=null;
     private Mat mat=null;
+    private String ext="jpg";
     private HImageHeader imageheader=null;
     
     public HImage(byte[] by){
@@ -90,6 +99,10 @@ public class HImage {
             int read=0;
             while((read=inputstream.read(buffer))>-1){
                 baos.write(buffer,0,read);
+                if(baos.size()>3000000){
+                    imagebytes=null;
+                    return;
+                }
             }
             imagebytes=baos.toByteArray();
         } catch (IOException ex) {
@@ -150,7 +163,23 @@ public class HImage {
      * @param imageheader - adds imageheader to current HImageObject
      */
     public void setImageHeader(HImageHeader imageheader){
-    
+        try {
+            IIOImage image = new IIOImage(this.getBufferedImage(), imageheader.getThumbnails(),imageheader.getMetadata());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageOutputStream ios = ImageIO.createImageOutputStream(baos) ;
+            Iterator writers = ImageIO.getImageWritersByFormatName(this.ext);
+            ImageWriter imageWriter = (ImageWriter) writers.next();
+            imageWriter.setOutput(ios);
+            imageWriter.write(image);
+            ios.flush();
+            imageWriter.dispose();
+            ios.close();
+            this.imagebytes=baos.toByteArray();
+            this.imageheader=imageheader;
+        } catch (IOException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
     private void generateMatImage(){
@@ -172,13 +201,28 @@ public class HImage {
     }
 
     private void generateImageHeader() {
-        imageheader=new HImageHeader();
+        try {
+            Iterator readers = ImageIO.getImageReadersByFormatName(ext);
+            ImageReader ir = (ImageReader) readers.next();
+            ImageReadParam param=ir.getDefaultReadParam();
+            
+            ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(imagebytes));
+            ir.setInput(iis);
+            IIOImage iio=ir.readAll(0,param);
+            imageheader=new HImageHeader(ir.getImageMetadata(0),iio.getThumbnails());
+            ir.dispose();
+
+        } catch (IOException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
     }
     
     public static void main(String args[]) {    
             /* Create and display the form */
         HImage x=new HImage(new File("./img.jpg"));
-        Mat y=x.getMatImage();
+        /*Mat y=x.getMatImage();
         BufferedImage z=x.getBufferedImage();
         System.out.println(z.getHeight());
         try {
@@ -193,9 +237,32 @@ public class HImage {
             Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+        
+        HImageHeader head=x.getImageHeader();
+        HImage y=new HImage(new File("./gray.jpg"));
+        y.setImageHeader(head);
+        y.saveToFile(y.getImageBytes());
+    }
+    
+    public void saveToFile(byte[] bytes){
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream("./final.jpg");
+            fos.write(bytes);
+            fos.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException ex) {
+                Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
-
     public byte[] getImageBytes() {
         return imagebytes;
     }

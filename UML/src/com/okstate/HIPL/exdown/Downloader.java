@@ -74,9 +74,9 @@ public class Downloader extends Configured implements Tool{
                        sbw=new SequenceBundleWriter(temp_path,conf);
 
                     
-			conf.set("mapred.map.child.java.opts", "-Xmx5000m");
-                        conf.set("mapred.reduce.child.java.opts", "-Xmx5000m");
-		
+			conf.set("mapreduce.map.java.opts", "-Xmx3000m");
+                        conf.set("mapreduce.reduce.java.opts", "-Xmx6000m");
+                        
 			String word = value.toString();
 
 			BufferedReader reader = new BufferedReader(new StringReader(word));

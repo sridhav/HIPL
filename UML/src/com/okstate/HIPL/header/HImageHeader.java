@@ -1,15 +1,33 @@
 package com.okstate.HIPL.header;
 
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import javax.imageio.metadata.IIOMetadata;
 
 public class HImageHeader {
+    IIOMetadata metadata=null;
+    List<BufferedImage> thumbnails=null;
+    
+    public HImageHeader(IIOMetadata metadata, List thumbs){
+        this.metadata=metadata;
+        this.thumbnails=thumbs;
+    }
+    public List<BufferedImage> getThumbnails(){
+        return thumbnails;
+    }
+    public IIOMetadata getMetadata(){
+        return metadata;
+    }
+    
     /**
      * Returns the file name of the Image
      * @return filename as String 
      */
+    
     public String getFileName() {
         return "";
     }

@@ -9,7 +9,9 @@ import com.okstate.HIPL.exdown.Downloader;
 import com.okstate.HIPL.extract.ImageExtractor;
 import com.okstate.HIPL.process.ImageProcess;
 import downloader.BundleDownloader;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.hadoop.util.Tool;
@@ -28,15 +30,28 @@ public class HIPL {
     public static void main(String[] args) throws Exception {
         try {
             // TODO code application logic here
-           String myargs[]={"/user/cloudera/urls/input","/user/cloudera/urls/outex/img.tmp","1"};
+           PrintStream out = new PrintStream(new FileOutputStream("output.txt"));
+           System.setOut(out);
+          
+          /* String myargs[]={"/user/cloudera/urls/input","/user/cloudera/urls/outex/img.tmp","100"};
            ToolRunner.run((Tool) new Downloader(), myargs);
            
            String myargs2[]={"/user/cloudera/urls/outex/img.tmp","com.okstate.HIPL.process.GrayAlgorithm"};
            ToolRunner.run((Tool) new ImageProcess(), myargs2);
            
-           String myargs3[]={"/user/cloudera/urls/outex/img.tmp","/tmp/imgs/"};
+           String myargs3[]={"/user/cloudera/urls/outex/img.tmp.out","/tmp/imgs/"};
            ToolRunner.run((Tool) new ImageExtractor(), myargs3);
-         
+          */ 
+           
+           String myargs[]={"/user/admin/images/input","/user/admin/images/outex/img.tmp","100"};
+           ToolRunner.run((Tool) new Downloader(), myargs);
+           
+           String myargs2[]={"/user/admin/images/outex/img.tmp","com.okstate.HIPL.process.GrayAlgorithm"};
+           ToolRunner.run((Tool) new ImageProcess(), myargs2);
+           
+           String myargs3[]={"/user/admin/images/outex/img.tmp.out","/tmp/imgs/"};
+           ToolRunner.run((Tool) new ImageExtractor(), myargs3);
+          
            
         } catch (IOException ex) {
             Logger.getLogger(HIPL.class.getName()).log(Level.SEVERE, null, ex);

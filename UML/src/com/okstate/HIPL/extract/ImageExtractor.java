@@ -84,6 +84,8 @@ public class ImageExtractor extends Configured implements Tool {
         }
         
         Configuration conf=new Configuration();
+        conf.set("mapreduce.map.java.opts", "-Xmx3000m");
+        conf.set("mapreduce.reduce.java.opts", "-Xmx6000m");
         
         conf.setStrings("inputpath", strings[0]);
         conf.setStrings("outdir", strings[1]);

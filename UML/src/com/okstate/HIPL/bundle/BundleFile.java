@@ -14,8 +14,10 @@ import org.apache.hadoop.fs.Path;
  * @author sridhar
  */
 public class BundleFile {
+    
     private Path _filepath;
     private Configuration _conf;
+    
     public BundleFile(String path, Configuration conf){
         _filepath=new Path(path);
         _conf=conf;
@@ -25,11 +27,11 @@ public class BundleFile {
         _filepath=path;
         _conf=conf;
     }
-
   
     public Config getHConfig(){
         return new Config(_filepath,_conf);
     } 
+    
     public String getName(){
         return null;
     }

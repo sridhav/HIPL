@@ -116,6 +116,8 @@ public class ImageProcess extends Configured implements Tool{
         
         
         Configuration conf=new Configuration();
+        conf.set("mapreduce.map.java.opts", "-Xmx6000m");
+        conf.set("mapreduce.reduce.java.opts", "-Xmx6000m");
         
         String inpfile=args[0];
         

@@ -41,7 +41,7 @@ public class DownloaderInputFormat extends FileInputFormat<IntWritable, Text>
 		int nodes = conf.getInt("downloader.nodes", 10);
 
 
-		ArrayList<String> hosts = new ArrayList<String>(0);
+		ArrayList<String> hosts = new ArrayList<String>();
 		List<InputSplit> splits = new ArrayList<InputSplit>();
 
 		FileSystem fileSystem = FileSystem.get(conf);
