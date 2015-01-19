@@ -8,7 +8,6 @@ package hipl;
 import com.okstate.HIPL.exdown.Downloader;
 import com.okstate.HIPL.extract.ImageExtractor;
 import com.okstate.HIPL.process.ImageProcess;
-import downloader.BundleDownloader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -43,13 +42,13 @@ public class HIPL {
            ToolRunner.run((Tool) new ImageExtractor(), myargs3);
           */ 
            
-           String myargs[]={"/user/admin/images/input","/user/admin/images/outex/img.tmp","100"};
+           String myargs[]={"/user/admin/images/input","/user/admin/images/outex/img.seq","10"};
            ToolRunner.run((Tool) new Downloader(), myargs);
            
-           String myargs2[]={"/user/admin/images/outex/img.tmp","com.okstate.HIPL.process.GrayAlgorithm"};
+           String myargs2[]={"/user/admin/images/outex/img.seq","com.okstate.HIPL.process.GrayAlgorithm"};
            ToolRunner.run((Tool) new ImageProcess(), myargs2);
-           
-           String myargs3[]={"/user/admin/images/outex/img.tmp.out","/tmp/imgs/"};
+        
+           String myargs3[]={"/user/admin/images/outex/img.seq","/tmp/imgs/"};
            ToolRunner.run((Tool) new ImageExtractor(), myargs3);
           
            

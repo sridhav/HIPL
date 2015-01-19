@@ -57,6 +57,7 @@ public class Downloader extends Configured implements Tool{
 		public void map(IntWritable key, Text value, Context context) 
 		throws IOException, InterruptedException
 		{       
+                        
                         SequenceBundleWriter sbw;
                       /*  if(conf.get("downloader.outtype").equals("map")){
                             String temp_path=conf.get("downloader.outpath")+key.get()+"_temp/";
