@@ -60,17 +60,17 @@ public class ImageExtractor extends Configured implements Tool {
             Path temp=null;
             FileSystem local = FileSystem.getLocal(conf);
             FSDataOutputStream out=null;
+            temp=new Path(conf.get("outdir")+key+".jpg");
+            out=local.create(temp);
+            out.write(value.getBytes());
+            context.write(new BooleanWritable(true),new Text("val"+key));
+
+            out.hflush();
+            out.hsync();
+            out.close(); 
             
-           
-                temp=new Path(conf.get("outdir")+key+".jpg");
-                out=local.create(temp);
-                out.write(value.getBytes());
-                context.write(new BooleanWritable(true),new Text("val"+key));
-                
-                out.hflush();
-                out.hsync();
-                out.close(); 
             
+            System.out.println("Extracteed :" + temp.toString());
         }
     }
     
@@ -85,7 +85,7 @@ public class ImageExtractor extends Configured implements Tool {
         
         Configuration conf=new Configuration();
         conf.set("mapreduce.map.java.opts", "-Xmx3000m");
-        conf.set("mapreduce.reduce.java.opts", "-Xmx6000m");
+        conf.set("mapreduce.reduce.java.opts", "-Xmx4000m");
         
         conf.setStrings("inputpath", strings[0]);
         conf.setStrings("outdir", strings[1]);
