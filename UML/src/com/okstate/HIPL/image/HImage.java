@@ -1,10 +1,5 @@
 package com.okstate.HIPL.image;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.Tag;
 import com.okstate.HIPL.header.HImageHeader;
 import com.okstate.HIPL.util.NativeUtil;
 
@@ -99,10 +94,10 @@ public class HImage {
             int read=0;
             while((read=inputstream.read(buffer))>-1){
                 baos.write(buffer,0,read);
-                if(baos.size()>3000000){
+                /*if(baos.size()>3000000){
                     imagebytes=null;
                     return;
-                }
+                }*/
             }
             imagebytes=baos.toByteArray();
         } catch (IOException ex) {
@@ -204,8 +199,7 @@ public class HImage {
         try {
             Iterator readers = ImageIO.getImageReadersByFormatName(ext);
             ImageReader ir = (ImageReader) readers.next();
-            ImageReadParam param=ir.getDefaultReadParam();
-            
+            ImageReadParam param=ir.getDefaultReadParam();        
             ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(imagebytes));
             ir.setInput(iis);
             IIOImage iio=ir.readAll(0,param);

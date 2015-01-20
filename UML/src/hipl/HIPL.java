@@ -48,7 +48,7 @@ public class HIPL {
            String myargs2[]={"/user/admin/images/outex/img.seq","com.okstate.HIPL.process.GrayAlgorithm"};
            ToolRunner.run((Tool) new ImageProcess(), myargs2);
         
-           String myargs3[]={"/user/admin/images/outex/img.seq","/tmp/imgs/"};
+           String myargs3[]={"/user/admin/images/outex/img.seq.out","/tmp/imgs/"};
            ToolRunner.run((Tool) new ImageExtractor(), myargs3);
           
            
