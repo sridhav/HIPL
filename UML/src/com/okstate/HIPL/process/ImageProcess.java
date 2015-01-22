@@ -51,7 +51,7 @@ public class ImageProcess extends Configured implements Tool{
             } catch (IOException ex) {
                 Logger.getLogger(ImageProcess.class.getName()).log(Level.SEVERE, null, ex);
             }
-            temp=temp+Random.random()+".out";
+           // temp=temp+Random.random()+".out";
             bf=new BundleFile(new Path(temp+Random.random()+".out"),conf);
             bw=bf.getBundleWriter();
         }

@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.IIOImage;
@@ -24,6 +26,8 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.tools.FileObject;
@@ -39,7 +43,7 @@ public class HImage {
      */
     static boolean loaded=false;
     
-    static{ 
+    static{
         if(System.getProperty("os.name").toLowerCase().contains("windows")){
             try {
                 
@@ -95,8 +99,8 @@ public class HImage {
             while((read=inputstream.read(buffer))>-1){
                 baos.write(buffer,0,read);
                 /*if(baos.size()>3000000){
-                    imagebytes=null;
-                    return;
+                imagebytes=null;
+                return;
                 }*/
             }
             imagebytes=baos.toByteArray();
@@ -158,23 +162,49 @@ public class HImage {
      * @param imageheader - adds imageheader to current HImageObject
      */
     public void setImageHeader(HImageHeader imageheader){
-        try {
-            IIOImage image = new IIOImage(this.getBufferedImage(), imageheader.getThumbnails(),imageheader.getMetadata());
+        if(imageheader != null){
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageOutputStream ios = ImageIO.createImageOutputStream(baos) ;
-            Iterator writers = ImageIO.getImageWritersByFormatName(this.ext);
+            ImageOutputStream ios =null;
+            try {
+                ios = ImageIO.createImageOutputStream(baos);
+            } catch (IOException ex) {
+                Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            Iterator writers = ImageIO.getImageWritersByFormatName(ext);
             ImageWriter imageWriter = (ImageWriter) writers.next();
+            JPEGImageWriteParam jp=new JPEGImageWriteParam(Locale.getDefault());
+            jp.setOptimizeHuffmanTables(true);
             imageWriter.setOutput(ios);
-            imageWriter.write(image);
-            ios.flush();
-            imageWriter.dispose();
-            ios.close();
-            this.imagebytes=baos.toByteArray();
-            this.imageheader=imageheader;
-        } catch (IOException ex) {
-            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+            IIOImage iio=new IIOImage(getBufferedImage(),imageheader.getThumbnails() ,imageheader.getMetadata());
+            try {
+                imageWriter.write(imageheader.getMetadata(),iio,jp);
+                ios.flush();
+                imageWriter.dispose();
+                ios.close();
+                imagebytes=baos.toByteArray();
+            } catch (IOException ex) {
+                //imagebytes=imagebytes;
+            }
         }
         
+        /*  try {
+        IIOImage image = new IIOImage(this.getBufferedImage(), imageheader.getThumbnails(),imageheader.getMetadata());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageOutputStream ios = ImageIO.createImageOutputStream(baos) ;
+        Iterator writers = ImageIO.getImageWritersByFormatName(this.ext);
+        ImageWriter imageWriter = (ImageWriter) writers.next();
+        imageWriter.setOutput(ios);
+        imageWriter.write(image);
+        ios.flush();
+        imageWriter.dispose();
+        ios.close();
+        this.imagebytes=baos.toByteArray();
+        this.imageheader=imageheader;
+        } catch (IOException ex) {
+        Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        */
     }
     
     private void generateMatImage(){
@@ -192,45 +222,50 @@ public class HImage {
         } catch (IOException e) {
             System.out.println("IO NOT FOUND");
         }
-
-    }
-
-    private void generateImageHeader() {
-        try {
-            Iterator readers = ImageIO.getImageReadersByFormatName(ext);
-            ImageReader ir = (ImageReader) readers.next();
-            ImageReadParam param=ir.getDefaultReadParam();        
-            ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(imagebytes));
-            ir.setInput(iis);
-            IIOImage iio=ir.readAll(0,param);
-            imageheader=new HImageHeader(ir.getImageMetadata(0),iio.getThumbnails());
-            ir.dispose();
-
-        } catch (IOException ex) {
-            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
         
     }
     
-    public static void main(String args[]) {    
-            /* Create and display the form */
+    private void generateImageHeader() {
+        Iterator readers = ImageIO.getImageReadersByFormatName(ext);
+        ImageReader ir = (ImageReader) readers.next();
+        ImageReadParam param=ir.getDefaultReadParam();
+        ImageInputStream iis=null;
+        try {
+            iis = ImageIO.createImageInputStream(new ByteArrayInputStream(imagebytes));
+            ir.setInput(iis);
+        } catch (IOException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        IIOImage iio=null;
+        try {
+            iio = ir.readAll(0, param);
+            IIOMetadata meta=iio.getMetadata();
+            List x=iio.getThumbnails();
+            imageheader=new HImageHeader(meta,x);
+            ir.dispose();
+        } catch (IOException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void main(String args[]) {
+        /* Create and display the form */
         HImage x=new HImage(new File("./img.jpg"));
         /*Mat y=x.getMatImage();
         BufferedImage z=x.getBufferedImage();
         System.out.println(z.getHeight());
         try {
-            Metadata metadata = ImageMetadataReader.readMetadata(new File("./img.jpg"));
-            System.out.println(metadata.getDirectoryCount());  
-            for (Directory directory : metadata.getDirectories()) {
-            for (Tag tag : directory.getTags()) {
-                System.out.println(tag);
-            }
+        Metadata metadata = ImageMetadataReader.readMetadata(new File("./img.jpg"));
+        System.out.println(metadata.getDirectoryCount());
+        for (Directory directory : metadata.getDirectories()) {
+        for (Tag tag : directory.getTags()) {
+        System.out.println(tag);
+        }
         }
         } catch (ImageProcessingException ex) {
-            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
         }*/
         
         HImageHeader head=x.getImageHeader();

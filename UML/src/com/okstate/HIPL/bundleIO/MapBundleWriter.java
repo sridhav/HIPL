@@ -34,6 +34,7 @@ public class MapBundleWriter implements BundleWriter{
     private MapFile.Writer _mapWriter;
     private long _mapTotal;
     private BundleFile _file;
+    
     public MapBundleWriter(BundleFile file){
         _file=file;
         _hConf=file.getHConfig();
@@ -63,6 +64,8 @@ public class MapBundleWriter implements BundleWriter{
         } catch (IOException ex) {
             Logger.getLogger(MapBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
     }
     
     @Override
