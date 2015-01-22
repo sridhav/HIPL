@@ -56,6 +56,7 @@ public class MapBundleWriter implements BundleWriter{
     @Override
     public void openToWrite() {
         try {
+            
             createDir(_hConf.getPath(),_hConf.getConfiguration());
             // Option opt1=MapFile.Writer.;
            
@@ -65,13 +66,15 @@ public class MapBundleWriter implements BundleWriter{
             Logger.getLogger(MapBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        
     }
     
     @Override
     public void appendImage(HImage himage) {
         try {
-            _mapWriter.append(new LongWritable(_mapTotal), new BytesWritable(himage.getImageBytes()));
+              if(himage.getImageBytes()!=null){
+                    _mapWriter.append(new LongWritable(_mapTotal), new BytesWritable(himage.getImageBytes()));
+                    _mapTotal++;
+              }
         } catch (IOException ex) {
             Logger.getLogger(SequenceBundleWriter.class.getName()).log(Level.SEVERE, null, ex);
         }

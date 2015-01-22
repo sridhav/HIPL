@@ -104,7 +104,7 @@ public class MapBundleReader implements BundleReader{
         }
     }
 
-    BytesWritable getValue() {
+    public BytesWritable getValue() {
         return _tempBytes;
     }
     

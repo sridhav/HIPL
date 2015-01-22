@@ -73,7 +73,7 @@ public class Downloader extends Configured implements Tool{
             
             }
             */
-            String temp_path = conf.get("downloader.outpath") + key.get() + ".tmp";
+            String temp_path = conf.get("downloader.outpath") + key.get() + ".map";
             System.out.println("Temp path: " + temp_path);
             BundleFile bf=new BundleFile(temp_path,conf);
             
@@ -121,7 +121,7 @@ public class Downloader extends Configured implements Tool{
                         if(size>=blockSize){
                             bw.close();
                             context.write(new BooleanWritable(true), new Text(bw.getBundleFile().getPath().toString()));
-                            temp_path = conf.get("downloader.outpath") + i + ".tmp";
+                            temp_path = conf.get("downloader.outpath") + i + ".map";
                             bf=new BundleFile(temp_path,conf);
                             bw = bf.getBundleWriter();
                             size=0;
@@ -211,10 +211,12 @@ public class Downloader extends Configured implements Tool{
     public static class DownloaderReducer extends Reducer<BooleanWritable, Text, BooleanWritable, Text> {
         
         private static Configuration conf;
+        private static BundleFile bf=null;
         @Override
         public void setup(Context jc) throws IOException
         {
             conf = jc.getConfiguration();
+            bf=new BundleFile(new Path(conf.get("downloader.outfile")),conf);
         }
         
         @Override
@@ -222,16 +224,16 @@ public class Downloader extends Configured implements Tool{
                 throws IOException, InterruptedException
         {
             if(key.get()){
-                SequenceBundleWriter sbw = new SequenceBundleWriter(new Path(conf.get("downloader.outfile")), conf);
+                BundleWriter bw = bf.getBundleWriter();
                 for (Text temp_string : values) {
                     Path temp_path = new Path(temp_string.toString());
                     //BundleFile bf=new BundleFile(temp_path,conf);
-                    sbw.appendBundle(temp_path,conf);
-                    context.write(new BooleanWritable(true), new Text(sbw.getBundleFile().getPath().toString()));
+                    bw.appendBundle(temp_path,conf);
+                    context.write(new BooleanWritable(true), new Text(bw.getBundleFile().getPath().toString()));
                     context.progress();
                 }
                 //sbw.appendBundle(new Path(conf.get("downloader.outpath")),conf);
-                sbw.close();
+                bw.close();
             }
         }
     }
