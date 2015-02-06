@@ -51,7 +51,7 @@ class ProcessImage {
                 }
                 ImageIO.write(bf, "jpg", baos);
                 HImage temp=new HImage(baos.toByteArray());
-                temp.setImageHeader(himage.getImageHeader());
+                //temp.setImageHeader(himage.getImageHeader());
                 himage=temp;
                 
             } catch (IOException ex) {

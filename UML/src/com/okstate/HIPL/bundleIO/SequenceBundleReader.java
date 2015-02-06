@@ -26,11 +26,11 @@ public class SequenceBundleReader implements BundleReader{
 
     private SequenceFile.Reader _seqReader;
     private long _seqTotal=0;
-    private Config _hConf;
-    private BundleFile _file;
-    long _tempKey;
-    HImage _tempImage;
-    private BytesWritable _tempImageBytes;
+    private Config _hConf=null;
+    private BundleFile _file=null;
+    long _tempKey=0;
+    HImage _tempImage=null;
+    private BytesWritable _tempImageBytes=null;
     
     public SequenceBundleReader(BundleFile file){
         _file=file;

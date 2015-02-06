@@ -4,8 +4,6 @@ package com.okstate.HIPL.exdown;
 import com.okstate.HIPL.bundle.BundleFile;
 import com.okstate.HIPL.bundleIO.BundleWriter;
 import com.okstate.HIPL.bundleIO.HARBundleWriter;
-import com.okstate.HIPL.bundleIO.MapBundleWriter;
-import com.okstate.HIPL.bundleIO.SequenceBundleWriter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -23,6 +21,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -45,7 +44,8 @@ import org.apache.hadoop.util.ToolRunner;
  */
 public class Downloader extends Configured implements Tool{
     
-    
+    private String[] args;
+  
     public static class DownloaderMapper extends Mapper<IntWritable, Text, BooleanWritable, Text>
     {
         private static Configuration conf;
@@ -54,6 +54,7 @@ public class Downloader extends Configured implements Tool{
         public void setup(Context jc) throws IOException
         {
             conf = jc.getConfiguration();
+            
         }
         
         @Override
@@ -61,7 +62,7 @@ public class Downloader extends Configured implements Tool{
                 throws IOException, InterruptedException
         {
             
-            BundleWriter bw;
+           
             /*  if(conf.get("downloader.outtype").equals("map")){
             String temp_path=conf.get("downloader.outpath")+key.get()+"_temp/";
             createDir(temp_path, conf);
@@ -73,11 +74,11 @@ public class Downloader extends Configured implements Tool{
             
             }
             */
-            String temp_path = conf.get("downloader.outpath") + key.get() + ".map";
+            String temp_path = conf.get("downloader.outpath") + key.get() +"."+ conf.get("downloader.outtype");
             System.out.println("Temp path: " + temp_path);
             BundleFile bf=new BundleFile(temp_path,conf);
             
-            bw=bf.getBundleWriter();
+             BundleWriter bw=bf.getBundleWriter();
             
             //conf.set("mapreduce.map.java.opts", "-Xmx3000m");
             //conf.set("mapreduce.reduce.java.opts", "-Xmx6000m");
@@ -118,13 +119,15 @@ public class Downloader extends Configured implements Tool{
                         continue;
                     
                     if (type != null && compareMIMEType(type)){
-                        if(size>=blockSize){
-                            bw.close();
-                            context.write(new BooleanWritable(true), new Text(bw.getBundleFile().getPath().toString()));
-                            temp_path = conf.get("downloader.outpath") + i + ".map";
-                            bf=new BundleFile(temp_path,conf);
-                            bw = bf.getBundleWriter();
-                            size=0;
+                        if(!conf.get("downloader.outtype").equals("har")){
+                            if(size>=blockSize){
+                                bw.close();
+                                context.write(new BooleanWritable(true), new Text(bw.getBundleFile().getPath().toString()));
+                                temp_path = conf.get("downloader.outpath") + i +"."+ conf.get("downloader.outtype");
+                                bf=new BundleFile(temp_path,conf);
+                                bw = bf.getBundleWriter();
+                                size=0;
+                            }
                         }
                         bw.appendImage(conn.getInputStream());
                     }
@@ -142,7 +145,7 @@ public class Downloader extends Configured implements Tool{
                     }
                 }   
                 i++;
-                
+
                 // Emit success
                 stopT = System.currentTimeMillis();
                 float el = (float)(stopT-startT)/1000.0f;
@@ -155,7 +158,8 @@ public class Downloader extends Configured implements Tool{
                 reader.close();
                 bw.close();
                 context.write(new BooleanWritable(true), new Text(temp_path));
-            } catch (Exception e)
+                
+                } catch (Exception e)
             {
                 e.printStackTrace();
             }
@@ -212,11 +216,14 @@ public class Downloader extends Configured implements Tool{
         
         private static Configuration conf;
         private static BundleFile bf=null;
+        private BundleWriter bw=null;
         @Override
         public void setup(Context jc) throws IOException
         {
             conf = jc.getConfiguration();
-            bf=new BundleFile(new Path(conf.get("downloader.outfile")),conf);
+            if(bf==null){
+                    bf=new BundleFile(new Path(conf.get("downloader.outfile")),conf);
+                }
         }
         
         @Override
@@ -224,19 +231,26 @@ public class Downloader extends Configured implements Tool{
                 throws IOException, InterruptedException
         {
             if(key.get()){
-                BundleWriter bw = bf.getBundleWriter();
+                bw=bf.getBundleWriter();
                 for (Text temp_string : values) {
                     Path temp_path = new Path(temp_string.toString());
+                    System.out.println(temp_path.toString());
                     //BundleFile bf=new BundleFile(temp_path,conf);
                     bw.appendBundle(temp_path,conf);
-                    context.write(new BooleanWritable(true), new Text(bw.getBundleFile().getPath().toString()));
-                    context.progress();
+                    
                 }
-                //sbw.appendBundle(new Path(conf.get("downloader.outpath")),conf);
-                bw.close();
+                System.out.println("Apeends Completed");
+                //context.write(new BooleanWritable(true), new Text("Done"));
+                //context.progress();
+                System.out.println("Calling close");
+                 bw.close();
+                //sbw.appendBundle(new Path(conf.get("downloader.outpath")),conf); 
             }
+            
         }
     }
+    
+    
     
     
     @Override
@@ -244,51 +258,48 @@ public class Downloader extends Configured implements Tool{
     {
         
         // Read in the configuration file
-        if (args.length < 3)
-        {
-            System.out.println("Usage: downloader <input file> <output file> <nodes> <outtype>");
-            System.exit(0);
-        }
         
         // Setup configuration
         Configuration conf = new Configuration();
         
         String inputFile = args[0];
         String outputFile = args[1];
-        int nodes = Integer.parseInt(args[2]);
+      
+        int nodes = 10;
+        
         //String outType=args[3];
         
         String outputPath = outputFile.substring(0, outputFile.lastIndexOf('/')+1);
-        System.out.println("Output HIB: " + outputPath);
+        System.out.println("Output Bundle: " + outputPath);
         
         
         conf.setInt("downloader.nodes", nodes);
         conf.setStrings("downloader.outfile", outputFile);
         conf.setStrings("downloader.outpath", outputPath);
-        // conf.setStrings("downloader.outtype", outType);
+        conf.setStrings("downloader.inptype", args[2]);
+        conf.setStrings("downloader.outtype",args[3]);
+        conf.setBoolean("dfs.support.append", true);
         
-        Job job = new Job(conf, "downloader");
+        
+        Job job = new Job(conf, "Bundle Downloader");
         job.setJarByClass(Downloader.class);
         job.setMapperClass(DownloaderMapper.class);
         job.setReducerClass(DownloaderReducer.class);
-        job.setNumReduceTasks(1);
+        
         // Set formats
         job.setOutputKeyClass(BooleanWritable.class);
         job.setOutputValueClass(Text.class);
         job.setInputFormatClass(DownloaderInputFormat.class);
-        
         //*************** IMPORTANT ****************\\
         job.setMapOutputKeyClass(BooleanWritable.class);
         job.setMapOutputValueClass(Text.class);
-        FileOutputFormat.setOutputPath(job, new Path(outputFile + "_output"));
-        
+        FileOutputFormat.setOutputPath(job, new Path(outputFile + "_mr_down"));
         DownloaderInputFormat.setInputPaths(job, new Path(inputFile));
-        
         job.setNumReduceTasks(1);
         return job.waitForCompletion(true) ? 0 : 1;
         
     }
-    
+   
     public static void createDir(String path, Configuration conf) throws IOException {
         Path output_path = new Path(path);
         
@@ -299,8 +310,8 @@ public class Downloader extends Configured implements Tool{
         }
     }
     
-    public static void main(String[] args) throws Exception {
-        int res = ToolRunner.run(new Downloader(), args);
-        System.exit(res);
-    }
+    public static void init(String[] args) throws Exception {
+        int res = ToolRunner.run((Tool) new Downloader(),args);
+        System.out.println(res);
+    }  
 }

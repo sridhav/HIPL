@@ -30,9 +30,6 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
-import javax.tools.FileObject;
-
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
@@ -47,17 +44,17 @@ public class HImage {
         if(System.getProperty("os.name").toLowerCase().contains("windows")){
             try {
                 
-                NativeUtil.loadFromJar("/lib/x64/opencv_java249.dll");
+                NativeUtil.loadFromJar("/lib/x64/opencv_java246.dll");
             } catch (IOException ex) {
                 Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         else if(System.getProperty("os.name").toLowerCase().contains("linux")){
-            try {
-                NativeUtil.loadFromJar("/lib/x64/libopencv_java249.so");
+          /*  try {
+                NativeUtil.loadFromJar("/lib/linux/libopencv_java246.so");
             } catch (IOException ex) {
                 Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
         }
         System.out.println(System.getProperty("os.name"));
     }
@@ -71,6 +68,23 @@ public class HImage {
     public HImage(byte[] by){
         this.imagebytes=by;
     }
+    
+    public HImage(Mat mat){
+        this.mat=mat;
+        byte[] data=new byte[mat.rows()*mat.cols()*(int)(mat.elemSize())];
+        mat.get(0,0,data);
+        
+        this.bufferedImage= new BufferedImage(mat.cols(),mat.rows(), BufferedImage.TYPE_BYTE_GRAY);
+        this.bufferedImage.getRaster().setDataElements(0, 0, mat.cols(), mat.rows(), data);
+        generateImageBytes(this.bufferedImage);
+    }
+    
+    public HImage(BufferedImage bf){
+        generateImageBytes(bf);
+        //generateMatImage();
+    }
+    
+    
     
     public HImage(File file) {
         FileInputStream fis=null;
@@ -96,14 +110,16 @@ public class HImage {
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
             byte buffer[]=new byte[1024];
             int read=0;
-            while((read=inputstream.read(buffer))>-1){
+            while((read=inputstream.read(buffer,0,buffer.length))!=-1){
                 baos.write(buffer,0,read);
                 /*if(baos.size()>3000000){
                 imagebytes=null;
                 return;
                 }*/
             }
+            baos.flush();
             imagebytes=baos.toByteArray();
+            baos.close();
         } catch (IOException ex) {
             Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -182,7 +198,7 @@ public class HImage {
                 ios.flush();
                 imageWriter.dispose();
                 ios.close();
-                imagebytes=baos.toByteArray();
+                //imagebytes=baos.toByteArray();
             } catch (IOException ex) {
                 //imagebytes=imagebytes;
             }
@@ -294,5 +310,18 @@ public class HImage {
     }
     public byte[] getImageBytes() {
         return imagebytes;
+    }
+
+    private void generateImageBytes(BufferedImage bf) {
+        if(this.imagebytes==null){
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write( bf, ext, baos);
+            baos.flush();
+            this.imagebytes = baos.toByteArray();
+        } catch (IOException ex) {
+            Logger.getLogger(HImage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        }
     }
 }

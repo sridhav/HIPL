@@ -5,9 +5,13 @@
  */
 package com.okstate.HIPL.bundle;
 
+import com.okstate.HIPL.bundleIO.BundleReader;
 import com.okstate.HIPL.bundleIO.BundleWriter;
 import com.okstate.HIPL.bundleIO.HARBundleWriter;
+import com.okstate.HIPL.bundleIO.MapBundleReader;
 import com.okstate.HIPL.bundleIO.MapBundleWriter;
+import com.okstate.HIPL.bundleIO.SequenceBundleReader;
+import com.okstate.HIPL.bundleIO.HARBundleReader;
 import com.okstate.HIPL.bundleIO.SequenceBundleWriter;
 import com.okstate.HIPL.util.Config;
 import org.apache.hadoop.conf.Configuration;
@@ -23,6 +27,10 @@ public class BundleFile {
     private Configuration _conf;
     private int type=0;
     private String str=null;
+    public static String SEQUENCE_FILE="seq";
+    public static String MAP_FILE="map";
+    private BundleWriter bw=null;
+    private BundleReader br=null;
     public BundleFile(String path, Configuration conf){
         _filepath=new Path(path);
         _conf=conf;
@@ -32,6 +40,7 @@ public class BundleFile {
     public BundleFile(Path path, Configuration conf){
         _filepath=path;
         _conf=conf;
+        str=path.toString();
     }
   
     public Config getHConfig(){
@@ -71,16 +80,47 @@ public class BundleFile {
     }
     
     public BundleWriter getBundleWriter(){
+        if(bw==null){
         String temp=_filepath.toString();
         int x=temp.lastIndexOf(".");
         String y=temp.substring(x+1);
         y=y.toLowerCase();
         switch(y){
-            case "seq": return new SequenceBundleWriter(this);
-            case "map": return new MapBundleWriter(this);
-            case "har": return new HARBundleWriter(this);
+            case "seq": bw= new SequenceBundleWriter(this);
+                        break;
+            case "map": bw= new MapBundleWriter(this);
+                break;
+            case "har": bw= new HARBundleWriter(this);
+                break;
+            default : bw= new SequenceBundleWriter(this);
+                    break;
         }
-        return new SequenceBundleWriter(this);
+        
+        }
+        return bw;
         
     }
+
+    public BundleReader getBundleReader(){
+         if(br==null){
+        String temp=_filepath.toString();
+        int x=temp.lastIndexOf(".");
+        String y=temp.substring(x+1);
+        y=y.toLowerCase();
+        switch(y){
+            case "seq": br=new SequenceBundleReader(this);
+                        break;
+            case "map": br= new MapBundleReader(this);
+                        break;
+            case "har": br= new HARBundleReader(this);
+                        break;
+            default   : br=new SequenceBundleReader(this);
+                break;
+        }
+        br=new SequenceBundleReader(this);
+         }
+         return br;
+    }
+
+    
 }

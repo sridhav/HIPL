@@ -34,7 +34,9 @@ public interface BundleWriter {
     long getImageCount();
     
     void close();
-
-     BundleFile getBundleFile();
+    
+    
+    
+    BundleFile getBundleFile();
     
 }

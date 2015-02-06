@@ -40,7 +40,25 @@ public class NativeUtil {
         System.out.println(prefix);
         System.out.println(suffix);
         // Logger.getLogger("parts "+parts.length).log(Level.WARNING, null, filename);
-        File temp=File.createTempFile(prefix, suffix);
+        File x=null;
+        if(System.getProperty("os.name").toLowerCase().contains("windows")){
+            x=new File("C:/tmp/HIPL/");
+            if(!x.exists()){
+                x.mkdirs();
+            }
+        } else if (System.getProperty("os.name").toLowerCase().contains("linux")){
+            x=new File("/tmp/HIPL/");
+            if(!x.exists()){
+                x.mkdirs();
+            }
+        }
+        
+        
+        
+        File temp= new File(x.getAbsolutePath()+"/"+prefix+suffix);
+        if(temp.exists()){
+            temp.delete();
+        }
        // temp.deleteOnExit();
         
        
@@ -68,7 +86,7 @@ public class NativeUtil {
     }
     
     public static void main(String args[]) throws IOException{
-       // loadFromJar("/lib/x64/opencv_java249.dll");
+       loadFromJar("/lib/x64/opencv_java249.dll");
     }
     
 }

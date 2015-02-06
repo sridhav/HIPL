@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 /**
  *
@@ -26,6 +29,14 @@ public class GrayAlgorithm implements GenericAlgorithm{
     
     @Override
     public void run() {
+      /*  Mat mat=himage.getMatImage();
+        Mat mat1 = new Mat(himage.getBufferedImage().getHeight(),himage.getBufferedImage().getWidth(),CvType.CV_8UC1);
+        
+        Imgproc.cvtColor(mat, mat1, Imgproc.COLOR_RGB2GRAY);
+        HImage temp=new HImage(mat1);
+        temp.setImageHeader(himage.getImageHeader());
+        himage=temp;
+        */
         try {
             BufferedImage bf=himage.getBufferedImage();
             int width=bf.getWidth();
@@ -50,6 +61,8 @@ public class GrayAlgorithm implements GenericAlgorithm{
         } catch (IOException ex) {
             Logger.getLogger(GrayAlgorithm.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
     }
 
     @Override

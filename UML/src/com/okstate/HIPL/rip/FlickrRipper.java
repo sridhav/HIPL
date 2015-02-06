@@ -55,15 +55,20 @@ public class FlickrRipper implements Ripper {
       
     }
     
-    private void search(String[] args) throws FlickrException{
-        try {
+    private void search(String[] args){
+        
             SearchParameters searchParams=new SearchParameters();
             searchParams.setSort(SearchParameters.INTERESTINGNESS_DESC);
             searchParams.setTags(args);
             PhotosInterface photosInterface=_flickr.getPhotosInterface();
             
             
-            PhotoList photoList=photosInterface.search(searchParams,600,100);
+            PhotoList photoList=null;
+        try {
+            photoList = photosInterface.search(searchParams,1600,1000);
+        } catch (FlickrException ex) {
+            Logger.getLogger(FlickrRipper.class.getName()).log(Level.SEVERE, null, ex);
+        }
            
             
             if(photoList!=null){
@@ -80,15 +85,18 @@ public class FlickrRipper implements Ripper {
                     */
                   //  PoolsInterface x=_flickr.getPoolsInterface();
                    // PhotoList pl=x.getPhotos(,null, 1000, 1);
-                    
-                    urls.add(photo.getOriginalUrl());
+                    if(photo!=null){
+                     if(!"".equals(photo.getOriginalSecret())){
+                             urls.add("https://farm"+photo.getFarm()+".staticflickr.com/"+photo.getServer()+"/"+photo.getId()+"_"+photo.getOriginalSecret()+"_o.jpg");
+                           //  https://farm4.staticflickr.com/3540/3632163083_4f8ccb6a00_l.jpg"
+                     }
+                    }
+                   
                     
                     
                 }
             }
-        } catch (FlickrException ex) {
-            Logger.getLogger(FlickrRipper.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
     }
     
     private void getGroupPools(String[] arr){
@@ -129,17 +137,17 @@ public class FlickrRipper implements Ripper {
     public static void main(String[] args) throws FlickrException{
         
             FlickrRipper rip=new FlickrRipper("273d4e4538bc7650a9049e6dc9b6b476", "db2e4a9d2866485c","125815714@N07",new File("flickr"));
-            /*String arr[]={"birds","animals"};
+            String arr[]={"space"};
             for(int i=0;i<arr.length;i++){
                 String temp[]={arr[i]};
                 rip.search(temp);
             }
             rip.writeURLFile(new File("urls2.txt"));
-        */
-            String grps[]={"1408810@N24"};
-            rip.getGroupPools(grps);
-           rip.writeURLFile(new File("birds.txt"));
         
+          /*  String grps[]={"1408810@N24"};
+            rip.getGroupPools(grps);
+            rip.writeURLFile(new File("birds.txt"));
+        */
         /*   rip.getUserPool("1408810@N24");
             rip.writeURLFile(new File("birds.txt"));*/
     }

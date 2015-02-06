@@ -6,21 +6,19 @@
 
 package com.okstate.HIPL.extract;
 
-import com.okstate.HIPL.bundleIO.SequenceBundleReader;
-import com.okstate.HIPL.image.HImage;
-import java.io.File;
+import static com.okstate.HIPL.process.ImageProcess.createDir;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 
@@ -56,25 +54,21 @@ public class ImageExtractor extends Configured implements Tool {
             path=new Path(conf.get("inputpath"));
             outdir=new Path(conf.get("outdir"));
            
-            
             Path temp=null;
-            FileSystem local = FileSystem.getLocal(conf);
+            FileSystem local =FileSystem.getLocal(conf);
             FSDataOutputStream out=null;
             temp=new Path(conf.get("outdir")+key+".jpg");
             out=local.create(temp);
             out.write(value.getBytes());
-            context.write(new BooleanWritable(true),new Text("val"+key));
-
+            System.out.println("Image Extracted :"+value.getBytes().length);
+            context.write(new BooleanWritable(true),new Text("val"+key));   
             out.hflush();
             out.hsync();
-            out.close(); 
+            out.close();  
             
             
-            System.out.println("Extracteed :" + temp.toString());
         }
     }
-    
-    
     
     @Override
     public int run(String[] strings) throws Exception {
@@ -84,13 +78,11 @@ public class ImageExtractor extends Configured implements Tool {
         }
         
         Configuration conf=new Configuration();
-        conf.set("mapreduce.map.java.opts", "-Xmx3000m");
-        conf.set("mapreduce.reduce.java.opts", "-Xmx4000m");
         
         conf.setStrings("inputpath", strings[0]);
         conf.setStrings("outdir", strings[1]);
         
-        Job job=new Job(conf,"Extracter");
+        Job job=new Job(conf,"Extractor");
         
         job.setJarByClass(ImageExtractor.class);
         job.setMapperClass(ImageExtractorMapper.class);
@@ -105,13 +97,38 @@ public class ImageExtractor extends Configured implements Tool {
         
         FileOutputFormat.setOutputPath(job, new Path(strings[0]+"_ext"));
         
-        FileInputFormat.addInputPath(job, new Path(strings[0]));
+       if(conf.get("inputpath").contains(".map")){
+            FileInputFormat.addInputPath(job, new Path(strings[0]+"/data"));
+        }else{
+            FileInputFormat.addInputPath(job, new Path(strings[0]));
+        }
+        String temp=conf.get("inputpath");
+         switch(conf.get("inputpath").substring(temp.length()-3)){
+            case "har": job.setInputFormatClass(FileInputFormat.class);
+                        break;
+            case "seq": job.setInputFormatClass(SequenceFileInputFormat.class);
+                        break;
+            case "map": job.setInputFormatClass(SequenceFileInputFormat.class);
+                        break;
+            default : job.setInputFormatClass(SequenceFileInputFormat.class);
+                        break;
+        }   
         
-        job.setInputFormatClass(SequenceFileInputFormat.class);
-        job.setOutputFormatClass(TextOutputFormat.class);
+         job.setOutputFormatClass(TextOutputFormat.class);
         
         return job.waitForCompletion(true)?0:1;
         
+    }
+    
+    
+    public static void createDir(String path, Configuration conf) throws IOException {
+        Path output_path = new Path(path);
+        
+        FileSystem fs = FileSystem.get(conf);
+        
+        if (!fs.exists(output_path)) {
+            fs.mkdirs(output_path);
+        }
     }
     
 }
