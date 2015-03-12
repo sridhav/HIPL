@@ -5,10 +5,10 @@
  */
 package hipl;
 
-import edu.okstate.HIPL.exdown.BundleDownloader;
-import edu.okstate.HIPL.extract.BundleExtractor;
-import edu.okstate.HIPL.process.BundleProcess;
-import edu.okstate.HIPL.process.GrayAlgorithm;
+import edu.okstate.cs.HIPL.exdown.BundleDownloader;
+import edu.okstate.cs.HIPL.extract.BundleExtractor;
+import edu.okstate.cs.HIPL.process.BundleProcess;
+import edu.okstate.cs.HIPL.process.GrayAlgorithm;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
