@@ -5,9 +5,9 @@
  */
 package hipl;
 
-import com.okstate.HIPL.exdown.Downloader;
-import com.okstate.HIPL.extract.ImageExtractor;
-import com.okstate.HIPL.process.ImageProcess;
+import edu.okstate.HIPL.exdown.Downloader;
+import edu.okstate.HIPL.extract.ImageExtractor;
+import edu.okstate.HIPL.process.ImageProcess;
 import downloader.BundleDownloader;
 import java.io.FileOutputStream;
 import java.io.IOException;
