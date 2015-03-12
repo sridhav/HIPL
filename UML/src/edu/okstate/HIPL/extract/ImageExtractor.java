@@ -6,16 +6,11 @@
 
 package edu.okstate.HIPL.extract;
 
-import static edu.okstate.HIPL.process.ImageProcess.createDir;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.io.BytesWritable;

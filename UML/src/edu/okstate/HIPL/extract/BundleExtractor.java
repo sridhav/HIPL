@@ -5,7 +5,6 @@
  */
 package edu.okstate.HIPL.extract;
 
-import edu.okstate.HIPL.exdown.BundleDownloader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Level;

@@ -3,7 +3,6 @@ package edu.okstate.HIPL.exdown;
 
 import edu.okstate.HIPL.bundle.BundleFile;
 import edu.okstate.HIPL.bundleIO.BundleWriter;
-import edu.okstate.HIPL.bundleIO.HARBundleWriter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -21,7 +20,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.NullOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 

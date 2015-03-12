@@ -6,7 +6,6 @@
 package edu.okstate.HIPL.process;
 
 import edu.okstate.HIPL.image.HImage;
-import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

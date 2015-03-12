@@ -16,7 +16,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.MapFile;
-import org.apache.hadoop.io.Writable;
 
 /**
  *

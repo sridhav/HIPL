@@ -2,13 +2,11 @@ package edu.okstate.HIPL.bundle;
 
 import edu.okstate.HIPL.image.HImage;
 import edu.okstate.HIPL.image.HImageEncoder;
-import edu.okstate.HIPL.image.HImageType;
 
 import java.io.File;
 import java.io.InputStream;
 
 
-import java.util.Collection;
 import org.apache.hadoop.fs.Path;
 
 public interface ImageBundle {

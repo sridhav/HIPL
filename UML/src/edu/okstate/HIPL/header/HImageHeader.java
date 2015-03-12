@@ -3,7 +3,6 @@ package edu.okstate.HIPL.header;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import javax.imageio.metadata.IIOMetadata;

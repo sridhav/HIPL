@@ -7,10 +7,6 @@ import edu.okstate.HIPL.util.Config;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-
-
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
