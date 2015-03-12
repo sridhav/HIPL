@@ -33,7 +33,7 @@ public class HIPL {
            PrintStream out = new PrintStream(new FileOutputStream("output.txt"));
            System.setOut(out);
           
-          /* String myargs[]={"/user/cloudera/urls/input","/user/cloudera/urls/outex/img.tmp","100"};
+           String myargs[]={"/user/cloudera/urls/input","/user/cloudera/urls/outex/img.tmp","100"};
            ToolRunner.run((Tool) new Downloader(), myargs);
            
            String myargs2[]={"/user/cloudera/urls/outex/img.tmp","com.okstate.HIPL.process.GrayAlgorithm"};
@@ -41,9 +41,9 @@ public class HIPL {
            
            String myargs3[]={"/user/cloudera/urls/outex/img.tmp.out","/tmp/imgs/"};
            ToolRunner.run((Tool) new ImageExtractor(), myargs3);
-          */ 
+          
            
-           String myargs[]={"/user/admin/images/input","/user/admin/images/outex/img.tmp","100"};
+          /* String myargs[]={"/user/admin/images/input","/user/admin/images/outex/img.tmp","100"};
            ToolRunner.run((Tool) new Downloader(), myargs);
            
            String myargs2[]={"/user/admin/images/outex/img.tmp","com.okstate.HIPL.process.GrayAlgorithm"};
@@ -51,7 +51,7 @@ public class HIPL {
            
            String myargs3[]={"/user/admin/images/outex/img.tmp.out","/tmp/imgs/"};
            ToolRunner.run((Tool) new ImageExtractor(), myargs3);
-          
+          */
            
         } catch (IOException ex) {
             Logger.getLogger(HIPL.class.getName()).log(Level.SEVERE, null, ex);
