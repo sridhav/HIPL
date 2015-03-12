@@ -5,10 +5,10 @@
  */
 package downloader;
 
-import com.okstate.HIPL.bundleIO.BundleWriter;
-import com.okstate.HIPL.bundleIO.MapBundleWriter;
-import com.okstate.HIPL.bundleIO.SequenceBundleWriter;
-import com.okstate.HIPL.util.Config;
+import edu.okstate.HIPL.bundleIO.BundleWriter;
+import edu.okstate.HIPL.bundleIO.MapBundleWriter;
+import edu.okstate.HIPL.bundleIO.SequenceBundleWriter;
+import edu.okstate.HIPL.util.Config;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
